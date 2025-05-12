@@ -28,10 +28,10 @@
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/seu-usuario/symphony.git
+   git clone https://github.com/felipetressmann/symphony-api.git
    cd symphony
+   docker-compose up
    ```
-   Em breve.
 
 ## Autores
 - Thiago Duvanel Ferreira
