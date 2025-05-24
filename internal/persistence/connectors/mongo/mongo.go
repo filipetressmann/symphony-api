@@ -10,13 +10,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type MongoConnection struct {
+	client *mongo.Client
+}
+
 // InitMongo inicializa a conexão com o banco de dados MongoDB e retorna o cliente.
 // O cliente pode ser usado para executar consultas e interagir com o banco de dados.
 // O URL de conexão é construído a partir das variáveis de ambiente definidas.
 // As variáveis de ambiente esperadas são:
 // MONGO_INITDB_ROOT_USERNAME: Nome de usuário do MongoDB (padrão: "root")
 // MONGO_INITDB_ROOT_PASSWORD: Senha do MongoDB (padrão: "rootpassword")
-func InitMongo() *mongo.Client {
+func NewMongoConnection() *MongoConnection {
 	username := config.GetEnv("MONGO_INITDB_ROOT_USERNAME", "root")
 	password := config.GetEnv("MONGO_INITDB_ROOT_PASSWORD", "rootpassword")
 	mongoURI := fmt.Sprintf("mongodb://%s:%s@localhost:27017", username, password)
@@ -34,5 +38,7 @@ func InitMongo() *mongo.Client {
 	}
 
 	log.Println("Conectado ao MongoDB!")
-	return client
+	return &MongoConnection {
+		client: client,
+	}
 }

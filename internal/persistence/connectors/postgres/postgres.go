@@ -1,0 +1,171 @@
+package postgres
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"strings"
+	"symphony-api/pkg/config"
+
+	"github.com/jackc/pgx/v5"
+)
+
+type PostgreConnection interface {
+	Put(data map[string]any, tableName string) int
+	Get(constraints map[string]any, tableName string) []map[string]any
+}
+
+type PostgreConnectionImpl struct {
+	*pgx.Conn
+}
+
+// InitPostgres inicializa a conexão com o banco de dados PostgreSQL e retorna o cliente.
+// O cliente pode ser usado para executar consultas e interagir com o banco de dados.
+// O URL de conexão é construído a partir das variáveis de ambiente definidas.
+// As variáveis de ambiente esperadas são:
+// POSTGRES_USER: Nome de usuário do PostgreSQL (padrão: "postgres")
+// POSTGRES_PASSWORD: Senha do PostgreSQL (padrão: "password")
+// POSTGRES_DB: Nome do banco de dados (padrão: "symphony")
+// POSTGRES_HOST: Endereço do host do PostgreSQL (padrão: "localhost")
+// POSTGRES_PORT: Porta do PostgreSQL (padrão: "5432")
+// Se a conexão falhar, o programa será encerrado com um log de erro.
+func NewPostgreConnection() PostgreConnection {
+	user := config.GetEnv("POSTGRES_USER", "postgres")
+	password := config.GetEnv("POSTGRES_PASSWORD", "password")
+	dbName := config.GetEnv("POSTGRES_DB", "symphony")
+	host := config.GetEnv("POSTGRES_HOST", "localhost")
+	port := config.GetEnv("POSTGRES_PORT", "5432")
+
+	dbUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, password, host, port, dbName)
+
+	client, err := pgx.Connect(context.Background(), dbUrl)
+	if err != nil {
+		log.Fatal("Failed to connect to postgre: ", err)
+	}
+
+	log.Println("Successfully connected to postgre!")
+	return &PostgreConnectionImpl{
+		Conn: client,
+	}
+}
+
+func (conn *PostgreConnectionImpl) Put(data map[string]any, tableName string) int {
+	var id int 
+
+	insertStatement, args := getInsertStament(data, tableName)
+
+	err := conn.QueryRow(
+		context.Background(),
+		insertStatement,
+		args,
+	).Scan(&id)
+
+	if err != nil {
+		log.Fatal("Insert failed:", err)
+	}
+
+	return id
+}
+
+func getInsertStament(data map[string]any, tableName string) (string, []any) {
+	keys := make([]string, 0, len(data))
+	values := make([]any, 0, len(data))
+	placeholders := make([]string, 0, len(data))
+
+	index := 1
+	for k, v := range data {
+		keys = append(keys, k)
+		values = append(values, v)
+		placeholders = append(placeholders, fmt.Sprintf("$%d", index))
+		index += 1
+	}
+
+	return fmt.Sprintf(
+		"INSERT INTO %s (%s) VALUES (%s) RETURNING id", 
+		tableName, 
+		joinComma(keys), 
+		joinComma(placeholders),
+	), values
+}
+
+func (conn *PostgreConnectionImpl) Get(constraints map[string]any, tableName string) []map[string]any {
+	sql, args := getSelectWthConstraintsQuery(constraints, tableName)
+
+	rows, err := conn.Query(
+		context.Background(),
+		sql,
+		args,
+	)
+	
+	if err != nil && err != pgx.ErrNoRows {
+		log.Fatal("Query failed:", err)
+	}
+
+	result, err := rowsToMaps(rows)
+
+	if err != nil {
+		log.Fatal("Row conversion failed: ", err)
+	}
+
+	return result
+}
+
+func rowsToMaps(rows pgx.Rows) ([]map[string]any, error) {
+	defer rows.Close()
+
+	columns := getRowColumns(rows)
+
+	var results []map[string]interface{}
+
+	for rows.Next() {
+		values, err := rows.Values()
+		if err != nil {
+			return nil, err
+		}
+
+		rowMap := make(map[string]interface{})
+		for i, col := range columns {
+			rowMap[col] = values[i]
+		}
+
+		results = append(results, rowMap)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	return results, nil
+}
+
+func getRowColumns(rows pgx.Rows) []string {
+	fieldDescriptions := rows.FieldDescriptions()
+	columns := make([]string, len(fieldDescriptions))
+	for i, fd := range fieldDescriptions {
+		columns[i] = string(fd.Name)
+	}
+
+	return columns
+}
+
+func getSelectWthConstraintsQuery(constraints map[string]any, tableName string) (string, []any) {
+	values := make([]any, 0, len(constraints))
+	constraintList := make([]string, 0, len(constraints))
+
+	index := 1
+	for k, v := range constraints {
+		constraintList = append(constraintList, fmt.Sprintf("%s = %d", k, index))
+		values = append(values, v)
+		index += 1
+	}
+
+	return fmt.Sprintf(
+			"SELECT * FROM %s WHERE %s", 
+			tableName, 
+			joinComma(constraintList),
+		), values
+}
+
+func joinComma(values []string) string {
+	return strings.Join(values, ",")
+}
