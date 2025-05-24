@@ -21,8 +21,8 @@ services:
     environment:
       NEO4J_AUTH: ${NEO4J_AUTH}
     ports:
-      - "7474:7474"
-      - "7687:7687"
+      - "7474"
+      - "7687"
     networks:
       - symphony-network
 
@@ -34,7 +34,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     ports:
-      - "27017:27017"
+      - "27017"
     networks:
       - symphony-network
 
@@ -46,7 +46,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "5432"
     networks:
       - symphony-network
 
