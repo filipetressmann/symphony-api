@@ -49,6 +49,8 @@ services:
       - "5432"
     networks:
       - symphony-network
+    volumes:
+      - ./schemas/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 networks:
   symphony-network:
