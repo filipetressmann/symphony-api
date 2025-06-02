@@ -37,8 +37,14 @@ func (userCrud *UserCrud) CreateUserHandler(w http.ResponseWriter, r *http.Reque
         return
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
         "message": "User created successfully",
         "user":    createdUser,
     })
+
+	if err != nil {
+		log.Printf("Error processing answer: %s", err)
+		http.Error(w, "Error creating user", http.StatusInternalServerError)
+        return
+	}
 }
