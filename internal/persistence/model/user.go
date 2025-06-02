@@ -55,7 +55,7 @@ func UserFromRequest(request *http.Request) (*User, error) {
 
 func MapToUser(data map[string]any) *User {
 	return &User{
-		UserId: data["userId"].(int64),
+		UserId: data["id"].(int64),
 		Username: data["username"].(string),
 		Fullname: data["fullname"].(string),
 		Email: data["email"].(string),
