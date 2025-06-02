@@ -1,13 +1,12 @@
 CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
-    full_name VARCHAR(100) NOT NULL,
+    fullname VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     telephone VARCHAR(20),
-    birthdate DATE NOT NULL,
-    profile_picture TEXT,
-    register_date TIMESTAMP NOT NULL,
-    last_access TIMESTAMP NOT NULL
+    birth_date DATE NOT NULL,
+    register_date TIMESTAMP NOT NULL DEFAULT now(),
+    last_access TIMESTAMP NOT NULL DEFAULT now()
 );
 
 CREATE TABLE post (
