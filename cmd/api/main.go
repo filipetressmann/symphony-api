@@ -3,7 +3,7 @@ package main
 import (
 	"symphony-api/internal/handlers"
 	"symphony-api/internal/persistence/connectors/mongo"
-	"symphony-api/internal/persistence/connectors/neo4j"
+	//"symphony-api/internal/persistence/connectors/neo4j"
 	"symphony-api/internal/persistence/connectors/postgres"
 	"symphony-api/internal/server"
 	"symphony-api/pkg/config"
@@ -15,14 +15,17 @@ import (
 // O servidor escuta na porta especificada pela variável de ambiente API_PORT ou na porta 8080 por padrão.
 // Em seguida, adiciona rotas.
 func main() {
-	_ = postgres.NewPostgreConnection()
+	postgresConnection := postgres.NewPostgreConnection()
 	_ = mongo.NewMongoConnection()
-	_ = neo4j.NewNeo4jConnection()
+	//_ = neo4j.NewNeo4jConnection()
+
+	userCrud := handlers.NewUserCrud(postgresConnection)
 
 	// Create a new server instance
 	srv := server.NewServer(config.GetEnv("API_PORT", "8080"))
 
 	srv.AddRoute("/", handlers.RootHandler())
+	srv.AddRoute("/api/create-user", userCrud.CreateUserHandler)
 
 	srv.Start()
 }
