@@ -11,7 +11,7 @@ import (
 )
 
 type PostgreConnection interface {
-	Put(data map[string]any, tableName string) int
+	Put(data map[string]any, tableName string) (int64, error)
 	Get(constraints map[string]any, tableName string) []map[string]any
 }
 
@@ -30,41 +30,37 @@ type PostgreConnectionImpl struct {
 // POSTGRES_PORT: Porta do PostgreSQL (padrão: "5432")
 // Se a conexão falhar, o programa será encerrado com um log de erro.
 func NewPostgreConnection() PostgreConnection {
-	user := config.GetEnv("POSTGRES_USER", "postgres")
+	user := config.GetEnv("POSTGRES_USER", "user")
 	password := config.GetEnv("POSTGRES_PASSWORD", "password")
 	dbName := config.GetEnv("POSTGRES_DB", "symphony")
-	host := config.GetEnv("POSTGRES_HOST", "localhost")
+	host := config.GetEnv("POSTGRES_HOST", "postgres")
 	port := config.GetEnv("POSTGRES_PORT", "5432")
 
-	dbUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, password, host, port, dbName)
-
+	dbUrl := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, dbName)
+	
 	client, err := pgx.Connect(context.Background(), dbUrl)
 	if err != nil {
-		log.Fatal("Failed to connect to postgre: ", err)
+		log.Fatal("Failed to connect to postgres: ", err)
 	}
 
-	log.Println("Successfully connected to postgre!")
+	log.Println("Successfully connected to postgres!")
 	return &PostgreConnectionImpl{
 		Conn: client,
 	}
 }
 
-func (conn *PostgreConnectionImpl) Put(data map[string]any, tableName string) int {
-	var id int 
+func (conn *PostgreConnectionImpl) Put(data map[string]any, tableName string) (int64, error) {
+	var id int64
 
 	insertStatement, args := getInsertStament(data, tableName)
-
+	log.Printf("Executing insert statement at Postgres: %s", insertStatement)
 	err := conn.QueryRow(
 		context.Background(),
 		insertStatement,
-		args,
+		args...,
 	).Scan(&id)
 
-	if err != nil {
-		log.Fatal("Insert failed:", err)
-	}
-
-	return id
+	return id, err
 }
 
 func getInsertStament(data map[string]any, tableName string) (string, []any) {
