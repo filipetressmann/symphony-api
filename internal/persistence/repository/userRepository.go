@@ -12,14 +12,21 @@ type UserRepository struct {
 }
 
 func NewUserRepository(connection postgres.PostgreConnection) *UserRepository {
-	
 	return &UserRepository{
 		connection: connection,
 	}
 }
 
-func (repository *UserRepository) Put(user *model.User) int {
-	return repository.connection.Put(user.ToMap(), TABLE_NAME)
+func (repository *UserRepository) Put(user *model.User) (*model.User, error) {
+	id, err := repository.connection.Put(user.ToMap(), TABLE_NAME)
+	return model.NewUser(
+		id,
+		user.Username,
+		user.Fullname,
+		user.Email,
+		user.Birth_date,
+		user.Telephone,
+	), err
 }
 
 func (repository *UserRepository) get(constraint map[string]any) []*model.User {

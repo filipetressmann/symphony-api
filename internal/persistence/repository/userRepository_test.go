@@ -14,9 +14,9 @@ type MockPostgreConnection struct {
 	mock.Mock
 }
 
-func (m *MockPostgreConnection) Put(data map[string]any, table string) int {
+func (m *MockPostgreConnection) Put(data map[string]any, table string) (int64, error) {
 	args := m.Called(data, table)
-	return args.Int(0)
+	return int64(args.Int(0)), nil
 }
 
 func (m *MockPostgreConnection) Get(constraint map[string]any, table string) []map[string]any {
@@ -40,8 +40,9 @@ func TestUserRepository_Put(t *testing.T) {
 
 	mockConn.On("Put", mock.Anything, TABLE_NAME).Return(1)
 
-	result := repo.Put(user)
-	assert.Equal(t, 1, result)
+	result, _ := repo.Put(user)
+
+	assert.Equal(t, int64(1), result.UserId)
 
 	mockConn.AssertExpectations(t)
 }
