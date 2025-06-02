@@ -23,21 +23,21 @@ type MongoConnection struct {
 func NewMongoConnection() *MongoConnection {
 	username := config.GetEnv("MONGO_INITDB_ROOT_USERNAME", "root")
 	password := config.GetEnv("MONGO_INITDB_ROOT_PASSWORD", "rootpassword")
-	mongoURI := fmt.Sprintf("mongodb://%s:%s@localhost:27017", username, password)
+	mongoURI := fmt.Sprintf("mongodb://%s:%s@mongo:27017", username, password)
 
 	clientOptions := options.Client().ApplyURI(mongoURI)
 
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
-		log.Fatalf("Falha a se conectar ao MongoDB: %v", err)
+		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
 
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
-		log.Fatalf("Falha ao pingar o MongoDB: %v", err)
+		log.Fatalf("Failed to ping MongoDB: %v", err)
 	}
 
-	log.Println("Conectado ao MongoDB!")
+	log.Println("Connected to MongoDB!")
 	return &MongoConnection {
 		client: client,
 	}
