@@ -19,16 +19,6 @@ type PostgreConnectionImpl struct {
 	*pgx.Conn
 }
 
-// InitPostgres inicializa a conexão com o banco de dados PostgreSQL e retorna o cliente.
-// O cliente pode ser usado para executar consultas e interagir com o banco de dados.
-// O URL de conexão é construído a partir das variáveis de ambiente definidas.
-// As variáveis de ambiente esperadas são:
-// POSTGRES_USER: Nome de usuário do PostgreSQL (padrão: "postgres")
-// POSTGRES_PASSWORD: Senha do PostgreSQL (padrão: "password")
-// POSTGRES_DB: Nome do banco de dados (padrão: "symphony")
-// POSTGRES_HOST: Endereço do host do PostgreSQL (padrão: "localhost")
-// POSTGRES_PORT: Porta do PostgreSQL (padrão: "5432")
-// Se a conexão falhar, o programa será encerrado com um log de erro.
 func NewPostgreConnection() PostgreConnection {
 	user := config.GetEnv("POSTGRES_USER", "user")
 	password := config.GetEnv("POSTGRES_PASSWORD", "password")
