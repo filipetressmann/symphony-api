@@ -17,6 +17,8 @@ services:
       - symphony-network
     env_file:
       - .env
+    volumes:
+      - ./:/app
 
   neo4j:
     image: neo4j:4.4
