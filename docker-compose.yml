@@ -7,9 +7,12 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - neo4j
-      - mongo
-      - postgres
+      neo4j:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     networks:
       - symphony-network
     env_file:
@@ -25,6 +28,12 @@ services:
       - "7687"
     networks:
       - symphony-network
+    healthcheck:
+      test: wget http://localhost:7474 || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
 
 
   mongo:
@@ -37,6 +46,12 @@ services:
       - "27017"
     networks:
       - symphony-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
 
   postgres:
     image: postgres:latest
@@ -51,6 +66,12 @@ services:
       - symphony-network
     volumes:
       - ./schemas/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
 
 networks:
   symphony-network:
