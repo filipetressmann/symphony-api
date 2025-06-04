@@ -41,8 +41,8 @@ func (s *Server) AddRoute(path string, handler http.HandlerFunc) {
 // If the server fails to start, it logs the error and exits the application.
 // The port parameter specifies the port on which the server will listen for incoming requests.
 func (s *Server) Start() {
-	log.Printf("Iniciando servidor em %s...", s.port)
+	log.Printf("Starting server in port %s...", s.port)
 	if err := http.ListenAndServe(":"+s.port, s.mux); err != nil {
-		log.Fatalf("Não foi possível iniciar o servidor: %s\n", err)
+		log.Fatalf("It wasn't possible to start the server in port %s\n", err)
 	}
 }

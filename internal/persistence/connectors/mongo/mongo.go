@@ -13,6 +13,7 @@ import (
 type MongoConnection struct {
 	client *mongo.Client
 }
+
 // NewMongoConnection creates a new MongoConnection instance.
 // It initializes the MongoDB client with the connection string
 // constructed from environment variables for username and password.
@@ -37,8 +38,8 @@ func NewMongoConnection() *MongoConnection {
 		log.Fatalf("Failed to ping MongoDB: %v", err)
 	}
 
-	log.Println("Connected to MongoDB!")
-	return &MongoConnection {
+	log.Println("Successfully connected to MongoDB!")
+	return &MongoConnection{
 		client: client,
 	}
 }
