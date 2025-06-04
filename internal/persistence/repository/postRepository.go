@@ -5,7 +5,7 @@ import (
 	"symphony-api/internal/persistence/model"
 )
 
-var POST_TABLE = "POST"
+var POST_TABLE = "post"
 
 type PostRepository struct {
 	connection postgres.PostgreConnection
