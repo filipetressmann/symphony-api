@@ -16,8 +16,7 @@ import (
 
 // @title Symphony API
 // @version 1.0
-// @description API para o projeto Symphony, que integra PostgreSQL, MongoDB e Neo4j.
-// @host localhost:8080
+// @description API for Symphony application, which is an social media created for educational purposes, focusing on music.
 func main() {
 	postgresConnection := postgres.NewPostgreConnection()
 	_ = mongo.NewMongoConnection()

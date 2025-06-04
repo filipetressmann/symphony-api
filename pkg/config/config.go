@@ -2,13 +2,11 @@ package config
 
 import "os"
 
-// GetEnv retorna o valor de uma variável de ambiente ou um valor padrão se a variável não estiver definida.
-// Se a variável de ambiente não estiver definida, retorna o valor padrão fornecido.
-// Se a variável de ambiente estiver definida, retorna o valor dela.
-// Exemplo de uso:
-// value := GetEnv("MY_ENV_VAR", "default_value")
-// Se MY_ENV_VAR estiver definido, value será o valor dela.
-// Caso contrário, value será "default_value".
+// GetEnv retrieves the value of the environment variable named by key.
+// If the variable is not set, it returns the defaultValue.
+// This function is useful for providing default values for configuration settings
+// in applications, allowing them to run with sensible defaults without requiring
+// explicit configuration in every environment.
 func GetEnv(key, defaultValue string) string {
 	value := os.Getenv(key)
 	if value == "" {

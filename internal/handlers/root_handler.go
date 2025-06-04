@@ -5,14 +5,16 @@ import (
 	"net/http"
 )
 
-// RootHandler é um manipulador HTTP que responde com "Olá, mundo!".
-// @Summary Manipulador raiz
-// @Description Este manipulador é usado para verificar se o servidor está funcionando corretamente.
-// @Tags Raiz
+// RootHandler is the root handler for the API.
+// @Summary Root Handler
+// @Description Returns a simple greeting message.
+// @Tags Root
+// @Produce plain
+// @Success 200 {string} string "Olá, mundo!"
 func RootHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if _, err := fmt.Fprintln(w, "Olá, mundo!"); err != nil {
-			http.Error(w, "Falha para escrever resposta.", http.StatusInternalServerError)
+		if _, err := fmt.Fprintln(w, "Hello, World!"); err != nil {
+			http.Error(w, "Failed in writing answer.", http.StatusInternalServerError)
 		}
 	}
 }
