@@ -3,17 +3,21 @@ package main
 import (
 	"symphony-api/internal/handlers"
 	"symphony-api/internal/persistence/connectors/mongo"
+
 	//"symphony-api/internal/persistence/connectors/neo4j"
 	"symphony-api/internal/persistence/connectors/postgres"
 	"symphony-api/internal/server"
 	"symphony-api/pkg/config"
+
+	_ "symphony-api/docs"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-// main é o ponto de entrada do aplicativo.
-// Ele inicializa as conexões com os bancos de dados PostgreSQL, MongoDB e Neo4j,
-// e cria uma nova instância do servidor HTTP.
-// O servidor escuta na porta especificada pela variável de ambiente API_PORT ou na porta 8080 por padrão.
-// Em seguida, adiciona rotas.
+// @title Symphony API
+// @version 1.0
+// @description API para o projeto Symphony, que integra PostgreSQL, MongoDB e Neo4j.
+// @host localhost:8080
 func main() {
 	postgresConnection := postgres.NewPostgreConnection()
 	_ = mongo.NewMongoConnection()
@@ -26,6 +30,8 @@ func main() {
 
 	srv.AddRoute("/", handlers.RootHandler())
 	srv.AddRoute("/api/create-user", userCrud.CreateUserHandler)
+
+	srv.AddRoute("/swagger/", httpSwagger.WrapHandler)
 
 	srv.Start()
 }

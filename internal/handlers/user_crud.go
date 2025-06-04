@@ -19,13 +19,24 @@ func NewUserCrud(connection postgres.PostgreConnection) *UserCrud {
 	}
 }
 
+// CreateUserHandler handles the creation of a new user.
+// @Summary Create a new user
+// @Description Creates a new user in the system.
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param user body model.User true "User data"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string "Invalid Input"
+// @Failure 500 {object} map[string]string "Internal Server Error"
+// @Router /api/create-user [post]
 func (userCrud *UserCrud) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := model.UserFromRequest(r)
 
 	if err != nil {
-        http.Error(w, "Invalid Input", http.StatusBadRequest)
-        return
-    }
+		http.Error(w, "Invalid Input", http.StatusBadRequest)
+		return
+	}
 
 	createdUser, err := userCrud.repository.Put(user)
 
@@ -34,17 +45,17 @@ func (userCrud *UserCrud) CreateUserHandler(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		log.Printf("Error creating user: %s", err)
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
-        return
+		return
 	}
 
 	err = json.NewEncoder(w).Encode(map[string]interface{}{
-        "message": "User created successfully",
-        "user":    createdUser,
-    })
+		"message": "User created successfully",
+		"user":    createdUser,
+	})
 
 	if err != nil {
 		log.Printf("Error processing answer: %s", err)
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
-        return
+		return
 	}
 }
