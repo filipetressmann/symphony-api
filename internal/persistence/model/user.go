@@ -37,11 +37,9 @@ func NewUser(
 
 func (user *User) ToMap() map[string]any {
 	return map[string]any{
-		"id": user.UserId,
 		"username": user.Username,
 		"fullname": user.Fullname,
 		"email": user.Email,
-		"register_date": user.Register_date,
 		"birth_date": user.Birth_date,
 		"telephone": user.Telephone,
 	}
