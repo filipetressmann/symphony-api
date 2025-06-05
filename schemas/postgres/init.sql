@@ -38,7 +38,7 @@ CREATE TABLE post_comment(
 );
 
 CREATE TABLE music_history (
-    id_history SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     music_id INTEGER NOT NULL,
     listened_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
