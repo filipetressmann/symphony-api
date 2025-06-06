@@ -12,7 +12,7 @@ import (
 
 type PostgreConnection interface {
 	Put(data map[string]any, tableName string) (int64, error)
-	Get(constraints map[string]any, tableName string) []map[string]any
+	Get(constraints map[string]any, tableName string) ([]map[string]any, error)
 }
 
 type PostgreConnectionImpl struct {
@@ -74,26 +74,22 @@ func getInsertStament(data map[string]any, tableName string) (string, []any) {
 	), values
 }
 
-func (conn *PostgreConnectionImpl) Get(constraints map[string]any, tableName string) []map[string]any {
+func (conn *PostgreConnectionImpl) Get(constraints map[string]any, tableName string) ([]map[string]any, error) {
 	sql, args := getSelectWthConstraintsQuery(constraints, tableName)
 
 	rows, err := conn.Query(
 		context.Background(),
 		sql,
-		args,
+		args...,
 	)
-	
-	if err != nil && err != pgx.ErrNoRows {
-		log.Fatal("Query failed:", err)
+
+	if err != nil {
+		return nil, err
 	}
 
 	result, err := rowsToMaps(rows)
 
-	if err != nil {
-		log.Fatal("Row conversion failed: ", err)
-	}
-
-	return result
+	return result, err
 }
 
 func rowsToMaps(rows pgx.Rows) ([]map[string]any, error) {
@@ -140,7 +136,7 @@ func getSelectWthConstraintsQuery(constraints map[string]any, tableName string) 
 
 	index := 1
 	for k, v := range constraints {
-		constraintList = append(constraintList, fmt.Sprintf("%s = %d", k, index))
+		constraintList = append(constraintList, fmt.Sprintf("%s = $%d", k, index))
 		values = append(values, v)
 		index += 1
 	}

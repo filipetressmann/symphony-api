@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
+	request_model "symphony-api/internal/handlers/model"
 	"symphony-api/internal/persistence/connectors/postgres"
 	"symphony-api/internal/persistence/model"
 	"symphony-api/internal/persistence/repository"
+	"symphony-api/internal/server"
 )
 
 type UserCrud struct {
@@ -30,6 +31,11 @@ func NewUserCrud(connection postgres.PostgreConnection) *UserCrud {
 // @Failure 400 {object} map[string]string "Invalid Input"
 // @Failure 500 {object} map[string]string "Internal Server Error"
 // @Router /api/create-user [post]
+func (userCrud *UserCrud) AddRoutes(server server.Server) {
+	server.AddRoute("/api/create-user", userCrud.CreateUserHandler)
+	server.AddRoute("/api/get-user-by-username", userCrud.GetUserByUsername)
+}
+
 func (userCrud *UserCrud) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := model.UserFromRequest(r)
 
@@ -48,14 +54,32 @@ func (userCrud *UserCrud) CreateUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(map[string]interface{}{
-		"message": "User created successfully",
-		"user":    createdUser,
-	})
+	mustEncodeAnswer(
+		map[string]any{"user": createdUser,}, 
+		w, 
+		"Error creating user",
+	)
+}
+
+func (userCrud *UserCrud) GetUserByUsername(w http.ResponseWriter, r *http.Request) {
+	request, err := request_model.NewGetUserByUsernameRequest(r)
 
 	if err != nil {
-		log.Printf("Error processing answer: %s", err)
-		http.Error(w, "Error creating user", http.StatusInternalServerError)
-		return
+        http.Error(w, "Invalid Input", http.StatusBadRequest)
+        return
+    }
+
+	user, err := userCrud.repository.GetByUsername(request.Username)
+
+	if err != nil {
+		log.Printf("Error fetching user user: %s", err)
+		http.Error(w, "Error fetching user", http.StatusInternalServerError)
+        return
 	}
+
+	mustEncodeAnswer(
+		map[string]any{"user": user,}, 
+		w, 
+		"Error fetching user",
+	)
 }
