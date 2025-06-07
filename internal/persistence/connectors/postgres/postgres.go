@@ -11,7 +11,7 @@ import (
 )
 
 type PostgreConnection interface {
-	Put(data map[string]any, tableName string) (int64, error)
+	Put(data map[string]any, tableName string) (int32, error)
 	Get(constraints map[string]any, tableName string) ([]map[string]any, error)
 }
 
@@ -39,8 +39,8 @@ func NewPostgreConnection() PostgreConnection {
 	}
 }
 
-func (conn *PostgreConnectionImpl) Put(data map[string]any, tableName string) (int64, error) {
-	var id int64
+func (conn *PostgreConnectionImpl) Put(data map[string]any, tableName string) (int32, error) {
+	var id int32
 
 	insertStatement, args := getInsertStament(data, tableName)
 	log.Printf("Executing insert statement at Postgres: %s", insertStatement)

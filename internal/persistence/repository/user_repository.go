@@ -6,7 +6,7 @@ import (
 	"symphony-api/internal/persistence/model"
 )
 
-var TABLE_NAME = "USERS"
+const USER_TABLE_NAME = "USERS"
 
 type UserRepository struct {
 	connection postgres.PostgreConnection
@@ -19,7 +19,7 @@ func NewUserRepository(connection postgres.PostgreConnection) *UserRepository {
 }
 
 func (repository *UserRepository) Put(user *model.User) (*model.User, error) {
-	id, err := repository.connection.Put(user.ToMap(), TABLE_NAME)
+	id, err := repository.connection.Put(user.ToMap(), USER_TABLE_NAME)
 	return model.NewUser(
 		id,
 		user.Username,
@@ -31,7 +31,7 @@ func (repository *UserRepository) Put(user *model.User) (*model.User, error) {
 }
 
 func (repository *UserRepository) get(constraint map[string]any) ([]*model.User, error) {
-	data, err := repository.connection.Get(constraint, TABLE_NAME)
+	data, err := repository.connection.Get(constraint, USER_TABLE_NAME)
 
 	if err != nil {
 		return nil, err

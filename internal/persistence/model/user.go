@@ -5,7 +5,7 @@ import (
 )
 
 type User struct {
-	UserId int64
+	UserId int32
 	Username string
 	Fullname string
 	Email string
@@ -15,7 +15,7 @@ type User struct {
 }
 
 func NewUser(
-	userId int64,
+	userId int32,
 	username string,
 	fullname string,
 	email string,
@@ -45,7 +45,7 @@ func (user *User) ToMap() map[string]any {
 
 func MapToUser(data map[string]any) *User {
 	return &User{
-		UserId: int64(data["id"].(int32)),
+		UserId: data["id"].(int32),
 		Username: data["username"].(string),
 		Fullname: data["fullname"].(string),
 		Email: data["email"].(string),
