@@ -28,7 +28,10 @@ func main() {
 	srv.AddRoute("/", handlers.RootHandler())
 	
 	userCrud := handlers.NewUserCrud(postgresConnection)
+	communityCrud := handlers.NewCommunityCrud(postgresConnection)
+
 	userCrud.AddRoutes(*srv)
+	communityCrud.AddRoutes(*srv)
 
 	srv.AddRoute("/swagger/", httpSwagger.WrapHandler)
 

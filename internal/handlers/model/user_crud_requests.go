@@ -43,7 +43,7 @@ func (request *CreateUserRequest) ToUser() *model.User {
 
 type UserResponse struct {
 	*BaseUserModel
-	Id int64 `json:"id"`
+	Id int32 `json:"id"`
 	Register_date time.Time `json:"register_date"`
 }
 
