@@ -46,17 +46,17 @@ CREATE TABLE music_history (
 );
 
 CREATE TABLE community (
-    community_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     community_name VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     description TEXT
 );
 
 CREATE TABLE community_posts(
-    community_id INTEGER NOT NULL,
+    id INTEGER NOT NULL,
     post_id INTEGER NOT NULL,
     PRIMARY KEY (community_id, post_id),
-    FOREIGN KEY (community_id) REFERENCES community(community_id) ON DELETE CASCADE,
+    FOREIGN KEY (community_id) REFERENCES community(id) ON DELETE CASCADE,
     FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE
 );
 
@@ -64,7 +64,7 @@ CREATE TABLE user_community (
     community_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     PRIMARY KEY (community_id, user_id),
-    FOREIGN KEY (community_id) REFERENCES community(community_id) ON DELETE CASCADE,
+    FOREIGN KEY (community_id) REFERENCES community(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
