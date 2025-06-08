@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
+	"net/http"
+	"strconv"
 	request_model "symphony-api/internal/handlers/model"
 	"symphony-api/internal/persistence/connectors/postgres"
 	"symphony-api/internal/persistence/repository"
@@ -26,11 +29,37 @@ func (postCrud *PostCrud) AddRoutes(server server.Server) {
 	)
 	server.AddRoute(
 		"/api/get-post-by-id",
-		createHandler(postCrud.GetPostByIdHandler),
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			postId, err := strconv.ParseInt(r.URL.Query().Get("post_id"), 10, 32)
+			if err != nil {
+				http.Error(w, "Invalid post ID", http.StatusBadRequest)
+				return
+			}
+			request := request_model.GetPostByIdRequest{PostId: int32(postId)}
+			response, err := postCrud.GetPostByIdHandler(request)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			json.NewEncoder(w).Encode(response)
+		}),
 	)
 	server.AddRoute(
 		"/api/get-posts-by-user-id",
-		createHandler(postCrud.GetPostsByUserIdHandler),
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			userId, err := strconv.ParseInt(r.URL.Query().Get("user_id"), 10, 32)
+			if err != nil {
+				http.Error(w, "Invalid user ID", http.StatusBadRequest)
+				return
+			}
+			request := request_model.GetPostsByUserIdRequest{UserId: int32(userId)}
+			response, err := postCrud.GetPostsByUserIdHandler(request)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			json.NewEncoder(w).Encode(response)
+		}),
 	)
 }
 
@@ -63,12 +92,12 @@ func (postCrud *PostCrud) CreatePostHandler(request request_model.CreatePostRequ
 // @Tags Post
 // @Accept json
 // @Produce json
-// @Param post body request_model.GetPostByIdRequest true "Post ID"
+// @Param post_id query int true "Post ID"
 // @Success 200 {object} request_model.GetPostByIdResponse
 // @Failure 400 {object} map[string]string "Invalid Input"
 // @Failure 404 {object} map[string]string "Post Not Found"
 // @Failure 500 {object} map[string]string "Internal Server Error"
-// @Router /api/get-post-by-id [post]
+// @Router /api/get-post-by-id [get]
 func (postCrud *PostCrud) GetPostByIdHandler(request request_model.GetPostByIdRequest) (*request_model.GetPostByIdResponse, error) {
 	post, err := postCrud.repository.GetById(request.PostId)
 	if err != nil {
@@ -84,11 +113,11 @@ func (postCrud *PostCrud) GetPostByIdHandler(request request_model.GetPostByIdRe
 // @Tags Post
 // @Accept json
 // @Produce json
-// @Param post body request_model.GetPostsByUserIdRequest true "User ID"
+// @Param user_id query int true "User ID"
 // @Success 200 {object} request_model.GetPostsByUserIdResponse
 // @Failure 400 {object} map[string]string "Invalid Input"
 // @Failure 500 {object} map[string]string "Internal Server Error"
-// @Router /api/get-posts-by-user-id [post]
+// @Router /api/get-posts-by-user-id [get]
 func (postCrud *PostCrud) GetPostsByUserIdHandler(request request_model.GetPostsByUserIdRequest) (*request_model.GetPostsByUserIdResponse, error) {
 	posts, err := postCrud.repository.GetByUserId(request.UserId)
 	if err != nil {
