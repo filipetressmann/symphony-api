@@ -53,7 +53,7 @@ CREATE TABLE community (
 );
 
 CREATE TABLE community_posts(
-    community_id INTEGER NOT NULL,
+    id INTEGER NOT NULL,
     post_id INTEGER NOT NULL,
     PRIMARY KEY (community_id, post_id),
     FOREIGN KEY (community_id) REFERENCES community(id) ON DELETE CASCADE,
