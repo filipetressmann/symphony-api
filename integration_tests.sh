@@ -58,4 +58,12 @@ post_and_assert "http://localhost:8080/api/community/list_users" "{
     \"community_name\": \"$community_name\"
 }" "List users in community"
 
+post_and_assert "http://localhost:8080/api/create-post" '{
+    "user_id": 1, "text": "Hello world", "url_foto": "image.jpg"
+}' "Create post"
+
+post_and_assert "http://localhost:8080/api/get-post-by-id?post_id=1" "{}" "Get post"
+
+post_and_assert "http://localhost:8080/api/get-posts-by-user-id?user_id=1" "{}" "List user posts"
+
 echo "🎉 All tests passed successfully!"

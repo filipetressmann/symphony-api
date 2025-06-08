@@ -49,7 +49,7 @@ func TestCreateUserHandler(t *testing.T) {
 		},
 	}
 
-	mockConn.On("Put", mock.Anything, repository.USER_TABLE_NAME).Return(1, nil)
+	mockConn.On("Put", mock.Anything, repository.USER_TABLE_NAME).Return(nil)
 
 	requestBody, _ := json.Marshal(request)
 	req := httptest.NewRequest("POST", "/api/create-user", bytes.NewBuffer(requestBody))
@@ -59,15 +59,11 @@ func TestCreateUserHandler(t *testing.T) {
 	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	var response request_model.UserResponse
+	var response request_model.SuccessCreationResponse
 	if err := json.Unmarshal(w.Body.Bytes(), &response); err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)
 	}
-	assert.Equal(t, request.Username, response.Username)
-	assert.Equal(t, request.Fullname, response.Fullname)
-	assert.Equal(t, request.Email, response.Email)
-	assert.Equal(t, request.Birth_date, response.Birth_date)
-	assert.Equal(t, request.Telephone, response.Telephone)
+	assert.Contains(t, response.Message, "Success")
 
 	mockConn.AssertExpectations(t)
 }

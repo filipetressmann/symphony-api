@@ -20,7 +20,7 @@ func TestPostRepository_Put(t *testing.T) {
 		LikeCount: 0,
 	}
 
-	mockConn.On("Put", mock.Anything, POST_TABLE).Return(1)
+	mockConn.On("PutReturningId", mock.Anything, POST_TABLE).Return(int32(1), nil)
 
 	result, _ := repo.Put(post)
 
@@ -53,7 +53,7 @@ func TestPostRepository_GetById(t *testing.T) {
 
 	post, postMap := getPostTestData()
 
-	mockConn.On("Get", mock.Anything, POST_TABLE).Return([]map[string]any{postMap})
+	mockConn.On("Get", mock.Anything, POST_TABLE).Return([]map[string]any{postMap}, nil)
 
 	result, _ := repo.GetById(1)
 
@@ -67,7 +67,7 @@ func TestPostRepository_GetByUserId(t *testing.T) {
 
 	post, postMap := getPostTestData()
 
-	mockConn.On("Get", mock.Anything, POST_TABLE).Return([]map[string]any{postMap})
+	mockConn.On("Get", mock.Anything, POST_TABLE).Return([]map[string]any{postMap}, nil)
 
 	result, _ := repo.GetByUserId(1)
 
