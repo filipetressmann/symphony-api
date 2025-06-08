@@ -15,6 +15,58 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/create-post": {
+            "post": {
+                "description": "Creates a new post in the system.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Post"
+                ],
+                "summary": "Create a new post",
+                "parameters": [
+                    {
+                        "description": "Post data",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request_model.CreatePostRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.CreatePostResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/create-user": {
             "post": {
                 "description": "Creates a new user in the system.",
@@ -67,19 +119,132 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/get-post-by-id": {
+            "post": {
+                "description": "Retrieves a post using its unique identifier.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Post"
+                ],
+                "summary": "Get post by ID",
+                "parameters": [
+                    {
+                        "description": "Post ID",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request_model.GetPostByIdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.GetPostByIdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Post Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/get-posts-by-user-id": {
+            "post": {
+                "description": "Retrieves all posts created by a specific user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Post"
+                ],
+                "summary": "Get posts by user ID",
+                "parameters": [
+                    {
+                        "description": "User ID",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request_model.GetPostsByUserIdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.GetPostsByUserIdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
         "model.User": {
             "type": "object",
             "properties": {
-                "birthdate": {
+                "birth_date": {
                     "type": "string"
                 },
                 "email": {
                     "type": "string"
                 },
-                "full_name": {
+                "fullname": {
                     "type": "string"
                 },
                 "register_date": {
@@ -95,6 +260,101 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "request_model.CreatePostRequest": {
+            "type": "object",
+            "properties": {
+                "like_count": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "url_foto": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request_model.CreatePostResponse": {
+            "type": "object",
+            "properties": {
+                "like_count": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "url_foto": {
+                    "type": "string"
+                }
+            }
+        },
+        "request_model.GetPostByIdRequest": {
+            "type": "object",
+            "properties": {
+                "post_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request_model.GetPostByIdResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "like_count": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "url_foto": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request_model.GetPostsByUserIdRequest": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request_model.GetPostsByUserIdResponse": {
+            "type": "object",
+            "properties": {
+                "posts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request_model.PostResponse"
+                    }
+                }
+            }
+        },
+        "request_model.PostResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "like_count": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "url_foto": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`
@@ -102,11 +362,11 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Symphony API",
-	Description:      "API para o projeto Symphony, que integra PostgreSQL, MongoDB e Neo4j.",
+	Description:      "API for Symphony application, which is an social media created for educational purposes, focusing on music.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
