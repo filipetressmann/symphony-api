@@ -16,9 +16,9 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-// @title Symphony API
-// @version 1.0
-// @description API for Symphony application, which is an social media created for educational purposes, focusing on music.
+//	@title			Symphony API
+//	@version		1.0
+//	@description	API for Symphony application, which is an social media created for educational purposes, focusing on music.
 func main() {
 	postgresConnection := postgres.NewPostgreConnection()
 	_ = mongo.NewMongoConnection()

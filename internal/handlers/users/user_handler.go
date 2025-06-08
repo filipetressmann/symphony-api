@@ -35,19 +35,23 @@ func (handler *UserHandler) AddRoutes(server server.Server) {
 		"/api/user/get_by_username", 
 		base_handlers.CreateHandler(handler.GetUserByUsername),
 	)
+	server.AddRoute(
+		"/api/user/list_communities", 
+		base_handlers.CreateHandler(handler.ListUserCommunities),
+	)
 }
 
 // CreateUserHandler handles the creation of a new user.
-// @Summary Create a new user
-// @Description Creates a new user in the system.
-// @Tags User
-// @Accept json
-// @Produce json
-// @Param user body model.User true "User data"
-// @Success 200 {object} map[string]interface{}
-// @Failure 400 {object} map[string]string "Invalid Input"
-// @Failure 500 {object} map[string]string "Internal Server Error"
-// @Router /api/create-user [post]
+//	@Summary		Create a new user
+//	@Description	Creates a new user in the system.
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		model.User	true	"User data"
+//	@Success		200		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]string	"Invalid Input"
+//	@Failure		500		{object}	map[string]string	"Internal Server Error"
+//	@Router			/api/create-user [post]
 func (handler *UserHandler) CreateUserHandler(request request_model.CreateUserRequest) (*request_model.SuccessCreationResponse, error) {
 	
 	err := handler.repository.Put(request.ToUser())
@@ -61,6 +65,17 @@ func (handler *UserHandler) CreateUserHandler(request request_model.CreateUserRe
 	return request_model.NewSuccessCreationResponse("Successfully created user"), nil
 }
 
+// Return user data based on their username
+//	@Summary		Get a user by its name
+//	@Description	Return user data based on their username
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			post	body		request_model.GetUserByUsernameRequest	true	"User data"
+//	@Success		200		{object}	request_model.UserResponse
+//	@Failure		400		{object}	map[string]string	"Invalid Input"
+//	@Failure		500		{object}	map[string]string	"Internal Server Error"
+//	@Router			/api/user/get_by_username [post]
 func (handler *UserHandler) GetUserByUsername(request request_model.GetUserByUsernameRequest) (*request_model.UserResponse, error) {
 	user, err := handler.repository.GetByUsername(request.Username)
 
@@ -71,6 +86,17 @@ func (handler *UserHandler) GetUserByUsername(request request_model.GetUserByUse
 	return request_model.NewUserResponse(user), nil
 }
 
+// Return all communities a user is part of
+//	@Summary		Get all communities of a user
+//	@Description	Return all communities a user is part of
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			post	body		request_model.ListUserCommunitiesRequest	true	"User data"
+//	@Success		200		{object}	request_model.ListUserCommunitiesResponse
+//	@Failure		400		{object}	map[string]string	"Invalid Input"
+//	@Failure		500		{object}	map[string]string	"Internal Server Error"
+//	@Router			/api/user/list_communities [post]
 func (handler *UserHandler) ListUserCommunities(request request_model.ListUserCommunitiesRequest) (*request_model.ListUserCommunitiesResponse, error) {
 	communities, err := handler.communityService.ListCommunitiesOfUser(request.Username)
 

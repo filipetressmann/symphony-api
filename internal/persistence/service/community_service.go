@@ -53,7 +53,7 @@ func (service *CommunityService) ListCommunitiesOfUser(username string) ([]*mode
 	user, err := service.userRepository.GetByUsername(username)
 
 	if err != nil {
-		return nil, errors.New("community does not exist")
+		return nil, errors.New("user does not exist")
 	}
 
 	return service.userRepository.ListUserCommunities(user)
