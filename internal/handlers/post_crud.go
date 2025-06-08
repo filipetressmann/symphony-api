@@ -41,7 +41,10 @@ func (postCrud *PostCrud) AddRoutes(server server.Server) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			json.NewEncoder(w).Encode(response)
+			if err := json.NewEncoder(w).Encode(response); err != nil {
+				http.Error(w, "Error encoding response", http.StatusInternalServerError)
+				return
+			}
 		}),
 	)
 	server.AddRoute(
@@ -58,7 +61,10 @@ func (postCrud *PostCrud) AddRoutes(server server.Server) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			json.NewEncoder(w).Encode(response)
+			if err := json.NewEncoder(w).Encode(response); err != nil {
+				http.Error(w, "Error encoding response", http.StatusInternalServerError)
+				return
+			}
 		}),
 	)
 }
