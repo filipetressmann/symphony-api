@@ -15,7 +15,6 @@ type User struct {
 }
 
 func NewUser(
-	userId int32,
 	username string,
 	fullname string,
 	email string,
@@ -23,7 +22,6 @@ func NewUser(
 	telephone string,
 ) *User {
 	return &User{
-		UserId: userId,
 		Username: username,
 		Fullname: fullname,
 		Email: email,
@@ -53,4 +51,14 @@ func MapToUser(data map[string]any) *User {
 		Birth_date: data["birth_date"].(time.Time),
 		Telephone: data["telephone"].(string),
 	}
+}
+
+func MapArrayToUsers(data []map[string]any) []*User {
+	users := make([]*User, 0)
+
+	for _, user := range data {
+		users = append(users, MapToUser(user))
+	}
+
+	return users
 }
