@@ -1,21 +1,17 @@
 package model
 
-import (
-	"encoding/json"
-	"net/http"
-)
 
 type Post struct {
-	PostId    int64
-	UserId    int64  `json:"user_id"`
+	PostId    int32
+	UserId    int32  `json:"user_id"`
 	Text      string `json:"text"`
 	UrlFoto   string `json:"url_foto"`
 	LikeCount int    `json:"like_count"`
 }
 
 func NewPost(
-	postId int64,
-	userId int64,
+	postId int32,
+	userId int32,
 	text string,
 	urlFoto string,
 	likeCount int,
@@ -31,7 +27,6 @@ func NewPost(
 
 func (post *Post) ToMap() map[string]any {
 	return map[string]any{
-		"post_id":    post.PostId,
 		"user_id":    post.UserId,
 		"text":       post.Text,
 		"url_foto":   post.UrlFoto,
@@ -39,18 +34,12 @@ func (post *Post) ToMap() map[string]any {
 	}
 }
 
-func PostFromRequest(request *http.Request) (*Post, error) {
-	var post Post
-	err := json.NewDecoder(request.Body).Decode(&post)
-	return &post, err
-}
-
 func MapToPost(data map[string]any) *Post {
 	return &Post{
-		PostId:    data["post_id"].(int64),
-		UserId:    data["user_id"].(int64),
+		PostId:    data["id"].(int32),
+		UserId:    data["user_id"].(int32),
 		Text:      data["text"].(string),
 		UrlFoto:   data["url_foto"].(string),
-		LikeCount: int(data["like_count"].(int64)),
+		LikeCount: int(data["like_count"].(int32)),
 	}
 }
