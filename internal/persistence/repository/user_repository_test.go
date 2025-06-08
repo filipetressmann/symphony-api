@@ -1,32 +1,19 @@
-package repository
+package repository_test
 
 import (
 	"testing"
 	"time"
 
 	"symphony-api/internal/persistence/model"
+	"symphony-api/internal/persistence/repository"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-type MockPostgreConnection struct {
-	mock.Mock
-}
-
-func (m *MockPostgreConnection) Put(data map[string]any, table string) (int32, error) {
-	args := m.Called(data, table)
-	return int32(args.Int(0)), nil
-}
-
-func (m *MockPostgreConnection) Get(constraint map[string]any, table string) ([]map[string]any, error) {
-	args := m.Called(constraint, table)
-	return args.Get(0).([]map[string]any), nil
-}
-
 func TestUserRepository_Put(t *testing.T) {
-	mockConn := &MockPostgreConnection{}
-	repo := NewUserRepository(mockConn)
+	mockConn := new(MockPostgreConnection)
+	repo := repository.NewUserRepository(mockConn)
 
 	user := &model.User{
 		UserId:       1,
@@ -38,7 +25,7 @@ func TestUserRepository_Put(t *testing.T) {
 		Telephone:    "123456789",
 	}
 
-	mockConn.On("Put", mock.Anything, USER_TABLE_NAME).Return(1)
+	mockConn.On("Put", mock.Anything, "USER").Return(1)
 
 	result, _ := repo.Put(user)
 
@@ -66,11 +53,11 @@ func getFetchTestData() (*model.User, map[string]any) {
 
 func TestUserRepository_GetById(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
-	repo := NewUserRepository(mockConn)
+	repo := repository.NewUserRepository(mockConn)
 
 	user, userMap := getFetchTestData()
 
-	mockConn.On("Get", mock.Anything, USER_TABLE_NAME).Return([]map[string]any{userMap})
+	mockConn.On("Get", mock.Anything, "USER").Return([]map[string]any{userMap})
 
 	result, _ := repo.GetById(1)
 
@@ -80,11 +67,11 @@ func TestUserRepository_GetById(t *testing.T) {
 
 func TestUserRepository_GetByUsername(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
-	repo := NewUserRepository(mockConn)
+	repo := repository.NewUserRepository(mockConn)
 
 	user, userMap := getFetchTestData()
 
-	mockConn.On("Get",  mock.Anything, USER_TABLE_NAME).Return([]map[string]any{userMap})
+	mockConn.On("Get",  mock.Anything, "USER").Return([]map[string]any{userMap})
 
 	result, _ := repo.GetByUsername("john")
 
