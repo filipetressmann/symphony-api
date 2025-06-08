@@ -1,4 +1,4 @@
-package handlers
+package user_handlers
 
 import (
 	"bytes"
@@ -8,32 +8,35 @@ import (
 	"testing"
 	"time"
 
+	base_handlers "symphony-api/internal/handlers/base"
 	request_model "symphony-api/internal/handlers/model"
-	"symphony-api/internal/persistence/connectors/postgres"
 	"symphony-api/internal/persistence/repository"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
-
 type MockPostgreConnection struct {
-	mock.Mock
-	postgres.PostgreConnection
+    mock.Mock
 }
 
-func (m *MockPostgreConnection) Put(data map[string]any, table string) (int32, error) {
-	args := m.Called(data, table)
-	return int32(args.Int(0)), args.Error(1)
+func (m *MockPostgreConnection) Put(data map[string]any, table string) error {
+    args := m.Called(data, table)
+    return args.Error(0)
 }
 
-func (m *MockPostgreConnection) Get(constraint map[string]any, table string) ([]map[string]any, error) {
-	args := m.Called(constraint, table)
-	return args.Get(0).([]map[string]any), args.Error(1)
+func (m *MockPostgreConnection) PutReturningId(data map[string]any, table string, idName string) (any, error) {
+    args := m.Called(data, table)
+    return args.Get(0), args.Error(1)
+}
+
+func (m *MockPostgreConnection) Get(constraints map[string]any, table string) ([]map[string]any, error) {
+    args := m.Called(constraints, table)
+    return args.Get(0).([]map[string]any), args.Error(1)
 }
 
 func TestCreateUserHandler(t *testing.T) {
 	mockConn := &MockPostgreConnection{}
-	userCrud := NewUserCrud(mockConn)
+	userCrud := NewUserHandler(mockConn)
 
 	birthDate := time.Date(1990, 5, 10, 0, 0, 0, 0, time.UTC)
 	request := request_model.CreateUserRequest{
@@ -52,7 +55,7 @@ func TestCreateUserHandler(t *testing.T) {
 	req := httptest.NewRequest("POST", "/api/create-user", bytes.NewBuffer(requestBody))
 	w := httptest.NewRecorder()
 
-	handler := createHandler(userCrud.CreateUserHandler)
+	handler := base_handlers.CreateHandler(userCrud.CreateUserHandler)
 	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -71,7 +74,7 @@ func TestCreateUserHandler(t *testing.T) {
 
 func TestGetUserByUsername(t *testing.T) {
 	mockConn := &MockPostgreConnection{}
-	userCrud := NewUserCrud(mockConn)
+	userCrud := NewUserHandler(mockConn)
 
 	birthDate := time.Date(1990, 5, 10, 0, 0, 0, 0, time.UTC)
 	userMap := map[string]any{
@@ -94,7 +97,7 @@ func TestGetUserByUsername(t *testing.T) {
 	req := httptest.NewRequest("POST", "/api/get-user-by-username", bytes.NewBuffer(requestBody))
 	w := httptest.NewRecorder()
 
-	handler := createHandler(userCrud.GetUserByUsername)
+	handler := base_handlers.CreateHandler(userCrud.GetUserByUsername)
 	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)

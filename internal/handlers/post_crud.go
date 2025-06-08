@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	base_handlers "symphony-api/internal/handlers/base"
 	request_model "symphony-api/internal/handlers/model"
 	"symphony-api/internal/persistence/connectors/postgres"
 	"symphony-api/internal/persistence/repository"
@@ -25,7 +26,7 @@ func NewPostCrud(connection postgres.PostgreConnection) *PostCrud {
 func (postCrud *PostCrud) AddRoutes(server server.Server) {
 	server.AddRoute(
 		"/api/create-post",
-		createHandler(postCrud.CreatePostHandler),
+		base_handlers.CreateHandler(postCrud.CreatePostHandler),
 	)
 	server.AddRoute(
 		"/api/get-post-by-id",

@@ -24,9 +24,9 @@ func main() {
 	_ = mongo.NewMongoConnection()
 	//_ = neo4j.NewNeo4jConnection()
 
-	userCrud := handlers.NewUserCrud(postgresConnection)
+	userCrud := user_handlers.NewUserHandler(postgresConnection)
 	postCrud := handlers.NewPostCrud(postgresConnection)
-	communityCrud := handlers.NewCommunityCrud(postgresConnection)
+	communityCrud := community_handlers.NewCommunityHandler(postgresConnection)
 
 	// Create a new server instance
 	srv := server.NewServer(config.GetEnv("API_PORT", "8080"))
