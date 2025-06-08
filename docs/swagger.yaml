@@ -1,11 +1,11 @@
 definitions:
   model.User:
     properties:
-      birthdate:
+      birth_date:
         type: string
       email:
         type: string
-      full_name:
+      fullname:
         type: string
       register_date:
         type: string
@@ -16,13 +16,98 @@ definitions:
       username:
         type: string
     type: object
-host: localhost:8080
+  request_model.CreatePostRequest:
+    properties:
+      like_count:
+        type: integer
+      text:
+        type: string
+      url_foto:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  request_model.CreatePostResponse:
+    properties:
+      like_count:
+        type: integer
+      text:
+        type: string
+      url_foto:
+        type: string
+    type: object
+  request_model.GetPostByIdResponse:
+    properties:
+      id:
+        type: integer
+      like_count:
+        type: integer
+      text:
+        type: string
+      url_foto:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  request_model.GetPostsByUserIdResponse:
+    properties:
+      posts:
+        items:
+          $ref: '#/definitions/request_model.PostResponse'
+        type: array
+    type: object
+  request_model.PostResponse:
+    properties:
+      id:
+        type: integer
+      like_count:
+        type: integer
+      text:
+        type: string
+      url_foto:
+        type: string
+    type: object
 info:
   contact: {}
-  description: API para o projeto Symphony, que integra PostgreSQL, MongoDB e Neo4j.
+  description: API for Symphony application, which is an social media created for
+    educational purposes, focusing on music.
   title: Symphony API
   version: "1.0"
 paths:
+  /api/create-post:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new post in the system.
+      parameters:
+      - description: Post data
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/request_model.CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.CreatePostResponse'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new post
+      tags:
+      - Post
   /api/create-user:
     post:
       consumes:
@@ -58,4 +143,76 @@ paths:
       summary: Create a new user
       tags:
       - User
+  /api/get-post-by-id:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a post using its unique identifier.
+      parameters:
+      - description: Post ID
+        in: query
+        name: post_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.GetPostByIdResponse'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Post Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get post by ID
+      tags:
+      - Post
+  /api/get-posts-by-user-id:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all posts created by a specific user.
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.GetPostsByUserIdResponse'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get posts by user ID
+      tags:
+      - Post
 swagger: "2.0"

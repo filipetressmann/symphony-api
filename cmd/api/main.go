@@ -22,15 +22,17 @@ func main() {
 	_ = mongo.NewMongoConnection()
 	//_ = neo4j.NewNeo4jConnection()
 
+	userCrud := handlers.NewUserCrud(postgresConnection)
+	postCrud := handlers.NewPostCrud(postgresConnection)
+	communityCrud := handlers.NewCommunityCrud(postgresConnection)
+
 	// Create a new server instance
 	srv := server.NewServer(config.GetEnv("API_PORT", "8080"))
 
 	srv.AddRoute("/", handlers.RootHandler())
-	
-	userCrud := handlers.NewUserCrud(postgresConnection)
-	communityCrud := handlers.NewCommunityCrud(postgresConnection)
 
 	userCrud.AddRoutes(*srv)
+	postCrud.AddRoutes(*srv)
 	communityCrud.AddRoutes(*srv)
 
 	srv.AddRoute("/swagger/", httpSwagger.WrapHandler)

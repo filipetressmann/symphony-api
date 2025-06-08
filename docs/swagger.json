@@ -1,13 +1,64 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "API para o projeto Symphony, que integra PostgreSQL, MongoDB e Neo4j.",
+        "description": "API for Symphony application, which is an social media created for educational purposes, focusing on music.",
         "title": "Symphony API",
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
     "paths": {
+        "/api/create-post": {
+            "post": {
+                "description": "Creates a new post in the system.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Post"
+                ],
+                "summary": "Create a new post",
+                "parameters": [
+                    {
+                        "description": "Post data",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request_model.CreatePostRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.CreatePostResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/create-user": {
             "post": {
                 "description": "Creates a new user in the system.",
@@ -60,19 +111,128 @@
                     }
                 }
             }
+        },
+        "/api/get-post-by-id": {
+            "get": {
+                "description": "Retrieves a post using its unique identifier.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Post"
+                ],
+                "summary": "Get post by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Post ID",
+                        "name": "post_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.GetPostByIdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Post Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/get-posts-by-user-id": {
+            "get": {
+                "description": "Retrieves all posts created by a specific user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Post"
+                ],
+                "summary": "Get posts by user ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.GetPostsByUserIdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
         "model.User": {
             "type": "object",
             "properties": {
-                "birthdate": {
+                "birth_date": {
                     "type": "string"
                 },
                 "email": {
                     "type": "string"
                 },
-                "full_name": {
+                "fullname": {
                     "type": "string"
                 },
                 "register_date": {
@@ -85,6 +245,85 @@
                     "type": "integer"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "request_model.CreatePostRequest": {
+            "type": "object",
+            "properties": {
+                "like_count": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "url_foto": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request_model.CreatePostResponse": {
+            "type": "object",
+            "properties": {
+                "like_count": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "url_foto": {
+                    "type": "string"
+                }
+            }
+        },
+        "request_model.GetPostByIdResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "like_count": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "url_foto": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request_model.GetPostsByUserIdResponse": {
+            "type": "object",
+            "properties": {
+                "posts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request_model.PostResponse"
+                    }
+                }
+            }
+        },
+        "request_model.PostResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "like_count": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "url_foto": {
                     "type": "string"
                 }
             }
