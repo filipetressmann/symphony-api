@@ -1,4 +1,4 @@
-package repository_test
+package repository
 
 import "github.com/stretchr/testify/mock"
 
@@ -6,9 +6,14 @@ type MockPostgreConnection struct {
     mock.Mock
 }
 
-func (m *MockPostgreConnection) Put(data map[string]any, table string) (int32, error) {
+func (m *MockPostgreConnection) Put(data map[string]any, table string) error {
     args := m.Called(data, table)
-    return int32(args.Int(0)), args.Error(1)
+    return args.Error(0)
+}
+
+func (m *MockPostgreConnection) PutReturningId(data map[string]any, table string, idName string) (any, error) {
+    args := m.Called(data, table)
+    return args.Get(0), args.Error(1)
 }
 
 func (m *MockPostgreConnection) Get(constraints map[string]any, table string) ([]map[string]any, error) {

@@ -1,11 +1,10 @@
-package repository_test
+package repository
 
 import (
 	"testing"
 	"time"
 
 	"symphony-api/internal/persistence/model"
-	"symphony-api/internal/persistence/repository"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -13,10 +12,9 @@ import (
 
 func TestUserRepository_Put(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
-	repo := repository.NewUserRepository(mockConn)
+	repo := NewUserRepository(mockConn)
 
 	user := &model.User{
-		UserId:       1,
 		Username:     "john",
 		Fullname:     "John Doe",
 		Email:        "john@example.com",
@@ -25,11 +23,11 @@ func TestUserRepository_Put(t *testing.T) {
 		Telephone:    "123456789",
 	}
 
-	mockConn.On("Put", mock.Anything, "USER").Return(1)
+	mockConn.On("Put", mock.Anything, USER_TABLE_NAME).Return(nil)
 
-	result, _ := repo.Put(user)
+	err := repo.Put(user)
 
-	assert.Equal(t, int32(1), result.UserId)
+	assert.NoError(t, err)
 
 	mockConn.AssertExpectations(t)
 }
@@ -53,11 +51,11 @@ func getFetchTestData() (*model.User, map[string]any) {
 
 func TestUserRepository_GetById(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
-	repo := repository.NewUserRepository(mockConn)
+	repo := NewUserRepository(mockConn)
 
 	user, userMap := getFetchTestData()
 
-	mockConn.On("Get", mock.Anything, "USER").Return([]map[string]any{userMap})
+	mockConn.On("Get", mock.Anything, USER_TABLE_NAME).Return([]map[string]any{userMap}, nil)
 
 	result, _ := repo.GetById(1)
 
@@ -67,11 +65,11 @@ func TestUserRepository_GetById(t *testing.T) {
 
 func TestUserRepository_GetByUsername(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
-	repo := repository.NewUserRepository(mockConn)
+	repo := NewUserRepository(mockConn)
 
 	user, userMap := getFetchTestData()
 
-	mockConn.On("Get",  mock.Anything, "USER").Return([]map[string]any{userMap})
+	mockConn.On("Get",  mock.Anything, USER_TABLE_NAME).Return([]map[string]any{userMap}, nil)
 
 	result, _ := repo.GetByUsername("john")
 
