@@ -58,6 +58,10 @@ post_and_assert "http://localhost:8080/api/community/list_users" "{
     \"community_name\": \"$community_name\"
 }" "List users in community"
 
+post_and_assert "http://localhost:8080/api/user/list_communities" "{
+    \"username\": \"$username\"
+}" "List user communities"
+
 post_and_assert "http://localhost:8080/api/create-post" '{
     "user_id": 1, "text": "Hello world", "url_foto": "image.jpg"
 }' "Create post"
