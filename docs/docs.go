@@ -121,7 +121,7 @@ const docTemplate = `{
             }
         },
         "/api/get-post-by-id": {
-            "post": {
+            "get": {
                 "description": "Retrieves a post using its unique identifier.",
                 "consumes": [
                     "application/json"
@@ -135,13 +135,11 @@ const docTemplate = `{
                 "summary": "Get post by ID",
                 "parameters": [
                     {
+                        "type": "integer",
                         "description": "Post ID",
-                        "name": "post",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request_model.GetPostByIdRequest"
-                        }
+                        "name": "post_id",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -182,7 +180,7 @@ const docTemplate = `{
             }
         },
         "/api/get-posts-by-user-id": {
-            "post": {
+            "get": {
                 "description": "Retrieves all posts created by a specific user.",
                 "consumes": [
                     "application/json"
@@ -196,13 +194,11 @@ const docTemplate = `{
                 "summary": "Get posts by user ID",
                 "parameters": [
                     {
+                        "type": "integer",
                         "description": "User ID",
-                        "name": "post",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request_model.GetPostsByUserIdRequest"
-                        }
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -292,14 +288,6 @@ const docTemplate = `{
                 }
             }
         },
-        "request_model.GetPostByIdRequest": {
-            "type": "object",
-            "properties": {
-                "post_id": {
-                    "type": "integer"
-                }
-            }
-        },
         "request_model.GetPostByIdResponse": {
             "type": "object",
             "properties": {
@@ -315,14 +303,6 @@ const docTemplate = `{
                 "url_foto": {
                     "type": "string"
                 },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "request_model.GetPostsByUserIdRequest": {
-            "type": "object",
-            "properties": {
                 "user_id": {
                     "type": "integer"
                 }

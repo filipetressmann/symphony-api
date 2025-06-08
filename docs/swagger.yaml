@@ -36,11 +36,6 @@ definitions:
       url_foto:
         type: string
     type: object
-  request_model.GetPostByIdRequest:
-    properties:
-      post_id:
-        type: integer
-    type: object
   request_model.GetPostByIdResponse:
     properties:
       id:
@@ -51,11 +46,6 @@ definitions:
         type: string
       url_foto:
         type: string
-      user_id:
-        type: integer
-    type: object
-  request_model.GetPostsByUserIdRequest:
-    properties:
       user_id:
         type: integer
     type: object
@@ -154,17 +144,16 @@ paths:
       tags:
       - User
   /api/get-post-by-id:
-    post:
+    get:
       consumes:
       - application/json
       description: Retrieves a post using its unique identifier.
       parameters:
       - description: Post ID
-        in: body
-        name: post
+        in: query
+        name: post_id
         required: true
-        schema:
-          $ref: '#/definitions/request_model.GetPostByIdRequest'
+        type: integer
       produces:
       - application/json
       responses:
@@ -194,17 +183,16 @@ paths:
       tags:
       - Post
   /api/get-posts-by-user-id:
-    post:
+    get:
       consumes:
       - application/json
       description: Retrieves all posts created by a specific user.
       parameters:
       - description: User ID
-        in: body
-        name: post
+        in: query
+        name: user_id
         required: true
-        schema:
-          $ref: '#/definitions/request_model.GetPostsByUserIdRequest'
+        type: integer
       produces:
       - application/json
       responses:
