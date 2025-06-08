@@ -1,13 +1,12 @@
 package handlers
 
 import (
-	"encoding/json"
+	"errors"
 	"log"
-	"net/http"
-	"strconv"
+	request_model "symphony-api/internal/handlers/model"
 	"symphony-api/internal/persistence/connectors/postgres"
-	"symphony-api/internal/persistence/model"
 	"symphony-api/internal/persistence/repository"
+	"symphony-api/internal/server"
 )
 
 type PostCrud struct {
@@ -20,65 +19,47 @@ func NewPostCrud(connection postgres.PostgreConnection) *PostCrud {
 	}
 }
 
-func (postCrud *PostCrud) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
-	post, err := model.PostFromRequest(r)
-	if err != nil {
-		http.Error(w, "Invalid Input", http.StatusBadRequest)
-		return
-	}
-
-	createdPost, err := postCrud.repository.Put(post)
-	if err != nil {
-		log.Printf("Error creating post: %s", err)
-		http.Error(w, "Error creating post", http.StatusInternalServerError)
-		return
-	}
-
-	err = json.NewEncoder(w).Encode(map[string]interface{}{
-		"message": "Post created successfully",
-		"post":    createdPost,
-	})
-
-	if err != nil {
-		log.Printf("Error processing answer: %s", err)
-		http.Error(w, "Error creating post", http.StatusInternalServerError)
-		return
-	}
+func (postCrud *PostCrud) AddRoutes(server server.Server) {
+	server.AddRoute(
+		"/api/create-post",
+		createHandler(postCrud.CreatePostHandler),
+	)
+	server.AddRoute(
+		"/api/get-post-by-id",
+		createHandler(postCrud.GetPostByIdHandler),
+	)
+	server.AddRoute(
+		"/api/get-posts-by-user-id",
+		createHandler(postCrud.GetPostsByUserIdHandler),
+	)
 }
 
-func (postCrud *PostCrud) GetPostHandler(w http.ResponseWriter, r *http.Request) {
-	postId, err := strconv.ParseInt(r.URL.Query().Get("post_id"), 10, 64)
+func (postCrud *PostCrud) CreatePostHandler(request request_model.CreatePostRequest) (*request_model.CreatePostResponse, error) {
+	log.Printf("CreatePostHandler called with request: %+v", request)
+	createdPost, err := postCrud.repository.Put(request.ToPost())
+
 	if err != nil {
-		http.Error(w, "Invalid post ID", http.StatusBadRequest)
-		return
+		log.Printf("Error creating post: %v", err)
+		return nil, errors.New("error creating post")
 	}
 
-	post := postCrud.repository.GetById(postId)
-	if post == nil {
-		http.Error(w, "Post not found", http.StatusNotFound)
-		return
-	}
-
-	err = json.NewEncoder(w).Encode(post)
-	if err != nil {
-		log.Printf("Error processing answer: %s", err)
-		http.Error(w, "Error retrieving post", http.StatusInternalServerError)
-		return
-	}
+	return request_model.NewCreatePostResponse(createdPost), nil
 }
 
-func (postCrud *PostCrud) GetUserPostsHandler(w http.ResponseWriter, r *http.Request) {
-	userId, err := strconv.ParseInt(r.URL.Query().Get("user_id"), 10, 64)
+func (postCrud *PostCrud) GetPostByIdHandler(request request_model.GetPostByIdRequest) (*request_model.GetPostByIdResponse, error) {
+	post, err := postCrud.repository.GetById(request.PostId)
 	if err != nil {
-		http.Error(w, "Invalid user ID", http.StatusBadRequest)
-		return
+		log.Printf("Error getting post: %v", err)
+		return nil, errors.New("error getting post")
 	}
+	return request_model.NewGetPostByIdResponse(post), nil
+}
 
-	posts := postCrud.repository.GetByUserId(userId)
-	err = json.NewEncoder(w).Encode(posts)
+func (postCrud *PostCrud) GetPostsByUserIdHandler(request request_model.GetPostsByUserIdRequest) (*request_model.GetPostsByUserIdResponse, error) {
+	posts, err := postCrud.repository.GetByUserId(request.UserId)
 	if err != nil {
-		log.Printf("Error processing answer: %s", err)
-		http.Error(w, "Error retrieving posts", http.StatusInternalServerError)
-		return
+		log.Printf("Error getting posts: %v", err)
+		return nil, errors.New("error getting posts")
 	}
+	return request_model.NewGetPostsByUserIdResponse(posts), nil
 }
