@@ -1,0 +1,61 @@
+definitions:
+  model.User:
+    properties:
+      birthdate:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      register_date:
+        type: string
+      telephone:
+        type: string
+      userId:
+        type: integer
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API para o projeto Symphony, que integra PostgreSQL, MongoDB e Neo4j.
+  title: Symphony API
+  version: "1.0"
+paths:
+  /api/create-user:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user in the system.
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new user
+      tags:
+      - User
+swagger: "2.0"

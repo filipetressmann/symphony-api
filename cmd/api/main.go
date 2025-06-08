@@ -8,13 +8,15 @@ import (
 	"symphony-api/internal/persistence/connectors/postgres"
 	"symphony-api/internal/server"
 	"symphony-api/pkg/config"
+
+	_ "symphony-api/docs"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-// main é o ponto de entrada do aplicativo.
-// Ele inicializa as conexões com os bancos de dados PostgreSQL, MongoDB e Neo4j,
-// e cria uma nova instância do servidor HTTP.
-// O servidor escuta na porta especificada pela variável de ambiente API_PORT ou na porta 8080 por padrão.
-// Em seguida, adiciona rotas.
+// @title Symphony API
+// @version 1.0
+// @description API for Symphony application, which is an social media created for educational purposes, focusing on music.
 func main() {
 	postgresConnection := postgres.NewPostgreConnection()
 	_ = mongo.NewMongoConnection()
@@ -22,15 +24,20 @@ func main() {
 
 	userCrud := handlers.NewUserCrud(postgresConnection)
 	postCrud := handlers.NewPostCrud(postgresConnection)
-
+  
 	// Create a new server instance
 	srv := server.NewServer(config.GetEnv("API_PORT", "8080"))
 
 	srv.AddRoute("/", handlers.RootHandler())
-	srv.AddRoute("/api/create-user", userCrud.CreateUserHandler)
-	srv.AddRoute("/api/create-post", postCrud.CreatePostHandler)
-	srv.AddRoute("/api/get-post", postCrud.GetPostHandler)
-	srv.AddRoute("/api/get-user-posts", postCrud.GetUserPostsHandler)
+	
+	userCrud := handlers.NewUserCrud(postgresConnection)
+	communityCrud := handlers.NewCommunityCrud(postgresConnection)
+
+	userCrud.AddRoutes(*srv)
+	communityCrud.AddRoutes(*srv)
+
+	srv.AddRoute("/swagger/", httpSwagger.WrapHandler)
+
 
 	srv.Start()
 }

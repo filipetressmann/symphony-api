@@ -12,7 +12,7 @@ func TestNewUser(t *testing.T) {
 	u := NewUser(0, "johndoe", "John Doe", "john@example.com", birthDate, "123456789")
 
 	assert.NotNil(t, u)
-	assert.Equal(t, int64(0), u.UserId)
+	assert.Equal(t, int32(0), u.UserId)
 	assert.Equal(t, "johndoe", u.Username)
 	assert.Equal(t, "John Doe", u.Fullname)
 	assert.Equal(t, "john@example.com", u.Email)
@@ -27,11 +27,9 @@ func TestUserToMap(t *testing.T) {
 
 	m := u.ToMap()
 
-	assert.Equal(t, u.UserId, m["id"])
 	assert.Equal(t, u.Username, m["username"])
 	assert.Equal(t, u.Fullname, m["fullname"])
 	assert.Equal(t, u.Email, m["email"])
-	assert.Equal(t, u.Register_date, m["register_date"])
 	assert.Equal(t, u.Birth_date, m["birth_date"])
 	assert.Equal(t, u.Telephone, m["telephone"])
 }

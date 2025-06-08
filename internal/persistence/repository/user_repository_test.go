@@ -14,14 +14,14 @@ type MockPostgreConnection struct {
 	mock.Mock
 }
 
-func (m *MockPostgreConnection) Put(data map[string]any, table string) (int64, error) {
+func (m *MockPostgreConnection) Put(data map[string]any, table string) (int32, error) {
 	args := m.Called(data, table)
-	return int64(args.Int(0)), nil
+	return int32(args.Int(0)), nil
 }
 
-func (m *MockPostgreConnection) Get(constraint map[string]any, table string) []map[string]any {
+func (m *MockPostgreConnection) Get(constraint map[string]any, table string) ([]map[string]any, error) {
 	args := m.Called(constraint, table)
-	return args.Get(0).([]map[string]any)
+	return args.Get(0).([]map[string]any), nil
 }
 
 func TestUserRepository_Put(t *testing.T) {
@@ -38,19 +38,16 @@ func TestUserRepository_Put(t *testing.T) {
 		Telephone:    "123456789",
 	}
 
-	mockConn.On("Put", mock.Anything, TABLE_NAME).Return(1)
+	mockConn.On("Put", mock.Anything, USER_TABLE_NAME).Return(1)
 
 	result, _ := repo.Put(user)
 
-	assert.Equal(t, int64(1), result.UserId)
+	assert.Equal(t, int32(1), result.UserId)
 
 	mockConn.AssertExpectations(t)
 }
 
-func TestUserRepository_GetById(t *testing.T) {
-	mockConn := new(MockPostgreConnection)
-	repo := NewUserRepository(mockConn)
-
+func getFetchTestData() (*model.User, map[string]any) {
 	user := &model.User{
 		UserId:       1,
 		Username:     "john",
@@ -60,10 +57,22 @@ func TestUserRepository_GetById(t *testing.T) {
 		Birth_date:    time.Date(1990, 5, 10, 0, 0, 0, 0, time.UTC),
 		Telephone:    "123456789",
 	}
+	userMap := user.ToMap()
+	userMap["id"] = int32(1)
+	userMap["register_date"] =  time.Now()
 
-	mockConn.On("Get", mock.Anything, TABLE_NAME).Return([]map[string]any{user.ToMap()})
+	return user, userMap
+}
 
-	result := repo.GetById(1)
+func TestUserRepository_GetById(t *testing.T) {
+	mockConn := new(MockPostgreConnection)
+	repo := NewUserRepository(mockConn)
+
+	user, userMap := getFetchTestData()
+
+	mockConn.On("Get", mock.Anything, USER_TABLE_NAME).Return([]map[string]any{userMap})
+
+	result, _ := repo.GetById(1)
 
 	assert.Equal(t, user, result)
 	mockConn.AssertExpectations(t)
@@ -73,19 +82,11 @@ func TestUserRepository_GetByUsername(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
 	repo := NewUserRepository(mockConn)
 
-	user := &model.User{
-		UserId:       1,
-		Username:     "john",
-		Fullname:     "John Doe",
-		Email:        "john@example.com",
-		Register_date: time.Now(),
-		Birth_date:    time.Date(1990, 5, 10, 0, 0, 0, 0, time.UTC),
-		Telephone:    "123456789",
-	}
+	user, userMap := getFetchTestData()
 
-	mockConn.On("Get",  mock.Anything, TABLE_NAME).Return([]map[string]any{user.ToMap()})
+	mockConn.On("Get",  mock.Anything, USER_TABLE_NAME).Return([]map[string]any{userMap})
 
-	result := repo.GetByUsername("john")
+	result, _ := repo.GetByUsername("john")
 
 	assert.Equal(t, user, result)
 	mockConn.AssertExpectations(t)

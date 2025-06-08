@@ -1,11 +1,12 @@
 package repository
 
 import (
+	"errors"
 	"symphony-api/internal/persistence/connectors/postgres"
 	"symphony-api/internal/persistence/model"
 )
 
-var TABLE_NAME = "USERS"
+const USER_TABLE_NAME = "USERS"
 
 type UserRepository struct {
 	connection postgres.PostgreConnection
@@ -18,7 +19,7 @@ func NewUserRepository(connection postgres.PostgreConnection) *UserRepository {
 }
 
 func (repository *UserRepository) Put(user *model.User) (*model.User, error) {
-	id, err := repository.connection.Put(user.ToMap(), TABLE_NAME)
+	id, err := repository.connection.Put(user.ToMap(), USER_TABLE_NAME)
 	return model.NewUser(
 		id,
 		user.Username,
@@ -29,8 +30,13 @@ func (repository *UserRepository) Put(user *model.User) (*model.User, error) {
 	), err
 }
 
-func (repository *UserRepository) get(constraint map[string]any) []*model.User {
-	data := repository.connection.Get(constraint, TABLE_NAME)
+func (repository *UserRepository) get(constraint map[string]any) ([]*model.User, error) {
+	data, err := repository.connection.Get(constraint, USER_TABLE_NAME)
+
+	if err != nil {
+		return nil, err
+	}
+
 
 	users := make([]*model.User, 0)
 
@@ -38,23 +44,28 @@ func (repository *UserRepository) get(constraint map[string]any) []*model.User {
 		users = append(users, model.MapToUser(user))
 	}
 
-	return users
+	return users, nil
 }
 
-func (repository *UserRepository) GetById(userId int64) *model.User {
+func (repository *UserRepository) GetById(userId int64) (*model.User, error) {
 	constraint := map[string]any {
-		"userId": userId,
+		"id": userId,
 	}
 
-	users := repository.get(constraint)
-	return users[0]
+	users, err := repository.get(constraint)
+	return users[0], err
 }
 
-func (repository *UserRepository) GetByUsername(username string) *model.User {
+func (repository *UserRepository) GetByUsername(username string) (*model.User, error) {
 	constraint := map[string]any {
 		"username": username,
 	}
 
-	users := repository.get(constraint)
-	return users[0]
+	users, err := repository.get(constraint)
+
+	if len(users) == 0 {
+		return nil, errors.New("user not found")
+	}
+
+	return users[0], err
 }

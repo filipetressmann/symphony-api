@@ -11,24 +11,14 @@ import (
 )
 
 type PostgreConnection interface {
-	Put(data map[string]any, tableName string) (int64, error)
-	Get(constraints map[string]any, tableName string) []map[string]any
+	Put(data map[string]any, tableName string) (int32, error)
+	Get(constraints map[string]any, tableName string) ([]map[string]any, error)
 }
 
 type PostgreConnectionImpl struct {
 	*pgx.Conn
 }
 
-// InitPostgres inicializa a conexão com o banco de dados PostgreSQL e retorna o cliente.
-// O cliente pode ser usado para executar consultas e interagir com o banco de dados.
-// O URL de conexão é construído a partir das variáveis de ambiente definidas.
-// As variáveis de ambiente esperadas são:
-// POSTGRES_USER: Nome de usuário do PostgreSQL (padrão: "postgres")
-// POSTGRES_PASSWORD: Senha do PostgreSQL (padrão: "password")
-// POSTGRES_DB: Nome do banco de dados (padrão: "symphony")
-// POSTGRES_HOST: Endereço do host do PostgreSQL (padrão: "localhost")
-// POSTGRES_PORT: Porta do PostgreSQL (padrão: "5432")
-// Se a conexão falhar, o programa será encerrado com um log de erro.
 func NewPostgreConnection() PostgreConnection {
 	user := config.GetEnv("POSTGRES_USER", "user")
 	password := config.GetEnv("POSTGRES_PASSWORD", "password")
@@ -49,8 +39,8 @@ func NewPostgreConnection() PostgreConnection {
 	}
 }
 
-func (conn *PostgreConnectionImpl) Put(data map[string]any, tableName string) (int64, error) {
-	var id int64
+func (conn *PostgreConnectionImpl) Put(data map[string]any, tableName string) (int32, error) {
+	var id int32
 
 	insertStatement, args := getInsertStament(data, tableName)
 	log.Printf("Executing insert statement at Postgres: %s", insertStatement)
@@ -84,26 +74,22 @@ func getInsertStament(data map[string]any, tableName string) (string, []any) {
 	), values
 }
 
-func (conn *PostgreConnectionImpl) Get(constraints map[string]any, tableName string) []map[string]any {
+func (conn *PostgreConnectionImpl) Get(constraints map[string]any, tableName string) ([]map[string]any, error) {
 	sql, args := getSelectWthConstraintsQuery(constraints, tableName)
 
 	rows, err := conn.Query(
 		context.Background(),
 		sql,
-		args,
+		args...,
 	)
-	
-	if err != nil && err != pgx.ErrNoRows {
-		log.Fatal("Query failed:", err)
+
+	if err != nil {
+		return nil, err
 	}
 
 	result, err := rowsToMaps(rows)
 
-	if err != nil {
-		log.Fatal("Row conversion failed: ", err)
-	}
-
-	return result
+	return result, err
 }
 
 func rowsToMaps(rows pgx.Rows) ([]map[string]any, error) {
@@ -150,7 +136,7 @@ func getSelectWthConstraintsQuery(constraints map[string]any, tableName string) 
 
 	index := 1
 	for k, v := range constraints {
-		constraintList = append(constraintList, fmt.Sprintf("%s = %d", k, index))
+		constraintList = append(constraintList, fmt.Sprintf("%s = $%d", k, index))
 		values = append(values, v)
 		index += 1
 	}

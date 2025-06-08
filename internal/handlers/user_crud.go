@@ -1,12 +1,11 @@
 package handlers
 
 import (
-	"encoding/json"
-	"log"
-	"net/http"
+	"errors"
+	request_model "symphony-api/internal/handlers/model"
 	"symphony-api/internal/persistence/connectors/postgres"
-	"symphony-api/internal/persistence/model"
 	"symphony-api/internal/persistence/repository"
+	"symphony-api/internal/server"
 )
 
 type UserCrud struct {
@@ -19,32 +18,47 @@ func NewUserCrud(connection postgres.PostgreConnection) *UserCrud {
 	}
 }
 
-func (userCrud *UserCrud) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := model.UserFromRequest(r)
+func (userCrud *UserCrud) AddRoutes(server server.Server) {
+	server.AddRoute(
+		"/api/create-user", 
+		createHandler(userCrud.CreateUserHandler),
+	)
+	server.AddRoute(
+		"/api/get-user-by-username", 
+		createHandler(userCrud.GetUserByUsername),
+	)
+}
 
-	if err != nil {
-        http.Error(w, "Invalid Input", http.StatusBadRequest)
-        return
-    }
-
-	createdUser, err := userCrud.repository.Put(user)
+// CreateUserHandler handles the creation of a new user.
+// @Summary Create a new user
+// @Description Creates a new user in the system.
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param user body model.User true "User data"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string "Invalid Input"
+// @Failure 500 {object} map[string]string "Internal Server Error"
+// @Router /api/create-user [post]
+func (userCrud *UserCrud) CreateUserHandler(request request_model.CreateUserRequest) (*request_model.UserResponse, error) {
+	
+	createdUser, err := userCrud.repository.Put(request.ToUser())
 
 	// Change this later if necessary. We should check why the creation failed and give a better
 	// answer to the requester.
 	if err != nil {
-		log.Printf("Error creating user: %s", err)
-		http.Error(w, "Error creating user", http.StatusInternalServerError)
-        return
+		return nil, errors.New("error creating user")
 	}
 
-	err = json.NewEncoder(w).Encode(map[string]interface{}{
-        "message": "User created successfully",
-        "user":    createdUser,
-    })
+	return request_model.NewUserResponse(createdUser), nil
+}
+
+func (userCrud *UserCrud) GetUserByUsername(request request_model.GetUserByUsernameRequest) (*request_model.UserResponse, error) {
+	user, err := userCrud.repository.GetByUsername(request.Username)
 
 	if err != nil {
-		log.Printf("Error processing answer: %s", err)
-		http.Error(w, "Error creating user", http.StatusInternalServerError)
-        return
+        return nil, errors.New("error fetching user")
 	}
+
+	return request_model.NewUserResponse(user), nil
 }

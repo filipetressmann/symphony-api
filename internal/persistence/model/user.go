@@ -1,23 +1,21 @@
 package model
 
 import (
-	"encoding/json"
-	"net/http"
 	"time"
 )
 
 type User struct {
-	UserId int64
-	Username string `json:"username"`
-	Fullname string  `json:"full_name"`
-	Email string `json:"email"`
+	UserId int32
+	Username string
+	Fullname string
+	Email string
 	Register_date time.Time
-	Birth_date time.Time `json:"birthdate"`
-	Telephone string `json:"telephone"`
+	Birth_date time.Time
+	Telephone string
 }
 
 func NewUser(
-	userId int64,
+	userId int32,
 	username string,
 	fullname string,
 	email string,
@@ -37,25 +35,17 @@ func NewUser(
 
 func (user *User) ToMap() map[string]any {
 	return map[string]any{
-		"id": user.UserId,
 		"username": user.Username,
 		"fullname": user.Fullname,
 		"email": user.Email,
-		"register_date": user.Register_date,
 		"birth_date": user.Birth_date,
 		"telephone": user.Telephone,
 	}
 }
 
-func UserFromRequest(request *http.Request) (*User, error) {
-	var user User
-    err := json.NewDecoder(request.Body).Decode(&user)
-    return &user, err
-}
-
 func MapToUser(data map[string]any) *User {
 	return &User{
-		UserId: data["id"].(int64),
+		UserId: data["id"].(int32),
 		Username: data["username"].(string),
 		Fullname: data["fullname"].(string),
 		Email: data["email"].(string),

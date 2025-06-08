@@ -12,15 +12,20 @@ type Neo4jConnection struct {
 	client *neo4j.Driver
 }
 
-// InitNeo4j inicializa a conexão com o banco de dados Neo4j e retorna o cliente.
-// O cliente pode ser usado para executar consultas e interagir com o banco de dados.
-// O URL de conexão é construído a partir das variáveis de ambiente definidas.
-// As variáveis de ambiente esperadas são:
-// NEO4J_HOST: Endereço do host do Neo4j (padrão: "localhost")
-// NEO4J_PORT: Porta do Neo4j (padrão: "7474")
-// NEO4J_USER: Nome de usuário do Neo4j (padrão: "neo4j")
-// NEO4J_PASSWORD: Senha do Neo4j (padrão: "password")
-// Se a conexão falhar, o programa será encerrado com um log de erro.
+// InitNeo4j initializes a new Neo4j connection.
+// It reads the connection parameters from environment variables,
+// constructs the connection URI, and creates a Neo4j driver.
+// If the connection fails, it logs the error and exits the application.
+// The Neo4jConnection struct holds the Neo4j driver which can be used
+// to interact with the Neo4j database.
+// It also verifies the connectivity to the Neo4j database.
+// If the connection is successful, it logs a success message.
+// The connection parameters are:
+// - NEO4J_HOST: The host of the Neo4j database (default: "neo4j").
+// - NEO4J_PORT: The port of the Neo4j database (default: "7474").
+// - NEO4J_USER: The username for the Neo4j database (default: "neo4j").
+// - NEO4J_PASSWORD: The password for the Neo4j database (default: "password").
+// Returns a pointer to a Neo4jConnection instance.
 func NewNeo4jConnection() *Neo4jConnection {
 	var client neo4j.Driver
 
