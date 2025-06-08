@@ -2,6 +2,8 @@ package main
 
 import (
 	"symphony-api/internal/handlers"
+	community_handlers "symphony-api/internal/handlers/community"
+	user_handlers "symphony-api/internal/handlers/users"
 	"symphony-api/internal/persistence/connectors/mongo"
 
 	//"symphony-api/internal/persistence/connectors/neo4j"

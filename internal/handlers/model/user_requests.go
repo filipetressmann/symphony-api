@@ -9,12 +9,24 @@ type GetUserByUsernameRequest struct {
 	Username string `json:"username"`
 }
 
+type ListUserCommunitiesRequest struct {
+	Username string `json:"username"`
+}
+
+type ListUserCommunitiesResponse struct {
+	Communities []*CommunityDataResponse `json:"communities"`
+}
+
 type BaseUserModel struct {
 	Username string `json:"username"`
 	Fullname string  `json:"fullname"`
 	Email string `json:"email"`
 	Birth_date time.Time `json:"birth_date"`
 	Telephone string `json:"telephone"`
+}
+
+type CreateUserRequest struct {
+	*BaseUserModel
 }
 
 func NewBaseUserModel(user *model.User) *BaseUserModel {
@@ -25,10 +37,6 @@ func NewBaseUserModel(user *model.User) *BaseUserModel {
 		Birth_date: user.Birth_date,
 		Telephone: user.Telephone,
 	}
-}
-
-type CreateUserRequest struct {
-	*BaseUserModel
 }
 
 func (request *CreateUserRequest) ToUser() *model.User {

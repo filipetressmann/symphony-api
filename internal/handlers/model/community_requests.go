@@ -14,13 +14,27 @@ type CreateCommunityRequest struct {
 	*BaseCommunityData
 }
 
+type GetCommunityByNameRequest struct {
+	CommunityName string `json:"community_name"`
+}
+
+type AddUserToCommunityRequest struct {
+	CommunityName string `json:"community_name"`
+	Username string `json:"username"`
+}
+
+type ListUsersOfCommunityRequest struct {
+	CommunityName string `json:"community_name"`
+	Username string `json:"username"`
+}
+
+type ListUsersOfCommunityResponse struct {
+	Users []*UserResponse `json:"users"`
+}
+
 type CommunityDataResponse struct {
 	*BaseCommunityData
 	CreatedAt time.Time `json:"created_at"`
-}
-
-type GetCommunityByNameRequest struct {
-	CommunityName string `json:"community_name"`
 }
 
 func (request *CreateCommunityRequest) ToCommunity() *model.Community {
