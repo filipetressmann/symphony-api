@@ -29,13 +29,13 @@ func TestUserRepository_Put(t *testing.T) {
 	repo := NewUserRepository(mockConn)
 
 	user := &model.User{
-		UserId:       1,
-		Username:     "john",
-		Fullname:     "John Doe",
-		Email:        "john@example.com",
+		UserId:        1,
+		Username:      "john",
+		Fullname:      "John Doe",
+		Email:         "john@example.com",
 		Register_date: time.Now(),
 		Birth_date:    time.Date(1990, 5, 10, 0, 0, 0, 0, time.UTC),
-		Telephone:    "123456789",
+		Telephone:     "123456789",
 	}
 
 	mockConn.On("Put", mock.Anything, USER_TABLE_NAME).Return(1)
@@ -48,18 +48,25 @@ func TestUserRepository_Put(t *testing.T) {
 }
 
 func getFetchTestData() (*model.User, map[string]any) {
+	fixedTime := time.Date(2025, 6, 8, 15, 4, 32, 0, time.Local)
 	user := &model.User{
-		UserId:       1,
-		Username:     "john",
-		Fullname:     "John Doe",
-		Email:        "john@example.com",
-		Register_date: time.Now(),
+		UserId:        1,
+		Username:      "john",
+		Fullname:      "John Doe",
+		Email:         "john@example.com",
+		Register_date: fixedTime,
 		Birth_date:    time.Date(1990, 5, 10, 0, 0, 0, 0, time.UTC),
-		Telephone:    "123456789",
+		Telephone:     "123456789",
 	}
-	userMap := user.ToMap()
-	userMap["id"] = int32(1)
-	userMap["register_date"] =  time.Now()
+	userMap := map[string]any{
+		"id":            int32(1),
+		"username":      "john",
+		"fullname":      "John Doe",
+		"email":         "john@example.com",
+		"register_date": fixedTime,
+		"birth_date":    time.Date(1990, 5, 10, 0, 0, 0, 0, time.UTC),
+		"telephone":     "123456789",
+	}
 
 	return user, userMap
 }
@@ -84,7 +91,7 @@ func TestUserRepository_GetByUsername(t *testing.T) {
 
 	user, userMap := getFetchTestData()
 
-	mockConn.On("Get",  mock.Anything, USER_TABLE_NAME).Return([]map[string]any{userMap})
+	mockConn.On("Get", mock.Anything, USER_TABLE_NAME).Return([]map[string]any{userMap})
 
 	result, _ := repo.GetByUsername("john")
 
