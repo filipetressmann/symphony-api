@@ -16,6 +16,39 @@ definitions:
       username:
         type: string
     type: object
+  request_model.AddUserToCommunityRequest:
+    properties:
+      community_name:
+        type: string
+      username:
+        type: string
+    required:
+    - community_name
+    - username
+    type: object
+  request_model.CommunityDataResponse:
+    properties:
+      community_name:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+    required:
+    - community_name
+    - created_at
+    - description
+    type: object
+  request_model.CreateCommunityRequest:
+    properties:
+      community_name:
+        type: string
+      description:
+        type: string
+    required:
+    - community_name
+    - description
+    type: object
   request_model.CreatePostRequest:
     properties:
       like_count:
@@ -26,6 +59,11 @@ definitions:
         type: string
       user_id:
         type: integer
+    required:
+    - like_count
+    - text
+    - url_foto
+    - user_id
     type: object
   request_model.CreatePostResponse:
     properties:
@@ -35,6 +73,17 @@ definitions:
         type: string
       url_foto:
         type: string
+    required:
+    - like_count
+    - text
+    - url_foto
+    type: object
+  request_model.GetCommunityByNameRequest:
+    properties:
+      community_name:
+        type: string
+    required:
+    - community_name
     type: object
   request_model.GetPostByIdResponse:
     properties:
@@ -48,6 +97,12 @@ definitions:
         type: string
       user_id:
         type: integer
+    required:
+    - id
+    - like_count
+    - text
+    - url_foto
+    - user_id
     type: object
   request_model.GetPostsByUserIdResponse:
     properties:
@@ -55,6 +110,50 @@ definitions:
         items:
           $ref: '#/definitions/request_model.PostResponse'
         type: array
+    required:
+    - posts
+    type: object
+  request_model.GetUserByUsernameRequest:
+    properties:
+      username:
+        type: string
+    required:
+    - username
+    type: object
+  request_model.ListUserCommunitiesRequest:
+    properties:
+      username:
+        type: string
+    required:
+    - username
+    type: object
+  request_model.ListUserCommunitiesResponse:
+    properties:
+      communities:
+        items:
+          $ref: '#/definitions/request_model.CommunityDataResponse'
+        type: array
+    required:
+    - communities
+    type: object
+  request_model.ListUsersOfCommunityRequest:
+    properties:
+      community_name:
+        type: string
+      username:
+        type: string
+    required:
+    - community_name
+    - username
+    type: object
+  request_model.ListUsersOfCommunityResponse:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/request_model.UserResponse'
+        type: array
+    required:
+    - users
     type: object
   request_model.PostResponse:
     properties:
@@ -66,6 +165,39 @@ definitions:
         type: string
       url_foto:
         type: string
+    required:
+    - id
+    - like_count
+    - text
+    - url_foto
+    type: object
+  request_model.SuccessCreationResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  request_model.UserResponse:
+    properties:
+      birth_date:
+        type: string
+      email:
+        type: string
+      fullname:
+        type: string
+      id:
+        type: integer
+      register_date:
+        type: string
+      telephone:
+        type: string
+      username:
+        type: string
+    required:
+    - birth_date
+    - email
+    - fullname
+    - telephone
+    - username
     type: object
 info:
   contact: {}
@@ -74,6 +206,143 @@ info:
   title: Symphony API
   version: "1.0"
 paths:
+  /api/community/add_user:
+    post:
+      consumes:
+      - application/json
+      description: Adds a user to a community based on the username and community
+        name
+      parameters:
+      - description: Community data
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/request_model.AddUserToCommunityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.SuccessCreationResponse'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add a user to a community
+      tags:
+      - community
+  /api/community/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new community in the system.
+      parameters:
+      - description: Community data
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/request_model.CreateCommunityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.SuccessCreationResponse'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new community
+      tags:
+      - community
+  /api/community/get_by_name:
+    post:
+      consumes:
+      - application/json
+      description: Returns the coomunity data based on the name.
+      parameters:
+      - description: Community data
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/request_model.GetCommunityByNameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.CommunityDataResponse'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Returns community data
+      tags:
+      - community
+  /api/community/list_users:
+    post:
+      consumes:
+      - application/json
+      description: List all user data of a community
+      parameters:
+      - description: Community data
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/request_model.ListUsersOfCommunityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.ListUsersOfCommunityResponse'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List user of a community
+      tags:
+      - community
   /api/create-post:
     post:
       consumes:
@@ -215,4 +484,72 @@ paths:
       summary: Get posts by user ID
       tags:
       - Post
+  /api/user/get_by_username:
+    post:
+      consumes:
+      - application/json
+      description: Return user data based on their username
+      parameters:
+      - description: User data
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/request_model.GetUserByUsernameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.UserResponse'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a user by its name
+      tags:
+      - User
+  /api/user/list_communities:
+    post:
+      consumes:
+      - application/json
+      description: Return all communities a user is part of
+      parameters:
+      - description: User data
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/request_model.ListUserCommunitiesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.ListUserCommunitiesResponse'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all communities of a user
+      tags:
+      - User
 swagger: "2.0"
