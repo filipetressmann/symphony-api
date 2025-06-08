@@ -31,7 +31,15 @@ func NewServer(port string) *Server {
 // This method allows you to define custom routes for your web application,
 // enabling you to handle different HTTP methods and paths.
 func (s *Server) AddRoute(path string, handler http.HandlerFunc) {
-	s.mux.HandleFunc(path, handler)
+	log.Printf("Registering route: %s", path)
+	s.mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Received request: %s %s", r.Method, r.URL.Path)
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler(w, r)
+	})
 }
 
 // Start starts the HTTP server on the specified port.
