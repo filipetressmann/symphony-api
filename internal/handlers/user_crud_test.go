@@ -57,7 +57,9 @@ func TestCreateUserHandler(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	var response request_model.UserResponse
-	json.Unmarshal(w.Body.Bytes(), &response)
+	if err := json.Unmarshal(w.Body.Bytes(), &response); err != nil {
+		t.Fatalf("Failed to unmarshal response: %v", err)
+	}
 	assert.Equal(t, request.Username, response.Username)
 	assert.Equal(t, request.Fullname, response.Fullname)
 	assert.Equal(t, request.Email, response.Email)
@@ -97,7 +99,9 @@ func TestGetUserByUsername(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	var response request_model.UserResponse
-	json.Unmarshal(w.Body.Bytes(), &response)
+	if err := json.Unmarshal(w.Body.Bytes(), &response); err != nil {
+		t.Fatalf("Failed to unmarshal response: %v", err)
+	}
 	assert.Equal(t, "guiwallace", response.Username)
 	assert.Equal(t, "Guilherme Wallace", response.Fullname)
 	assert.Equal(t, "guiwallace@example.com", response.Email)
