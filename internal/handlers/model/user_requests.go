@@ -6,15 +6,27 @@ import (
 )
 
 type GetUserByUsernameRequest struct {
-	Username string `json:"username"`
+	Username string `json:"username" binding:"required"`
+}
+
+type ListUserCommunitiesRequest struct {
+	Username string `json:"username" binding:"required"`
+}
+
+type ListUserCommunitiesResponse struct {
+	Communities []*CommunityDataResponse `json:"communities" binding:"required"`
 }
 
 type BaseUserModel struct {
-	Username string `json:"username"`
-	Fullname string  `json:"fullname"`
-	Email string `json:"email"`
-	Birth_date time.Time `json:"birth_date"`
-	Telephone string `json:"telephone"`
+	Username string `json:"username" binding:"required"`
+	Fullname string  `json:"fullname" binding:"required"`
+	Email string `json:"email" binding:"required"`
+	Birth_date time.Time `json:"birth_date" binding:"required"`
+	Telephone string `json:"telephone" binding:"required"`
+}
+
+type CreateUserRequest struct {
+	*BaseUserModel
 }
 
 func NewBaseUserModel(user *model.User) *BaseUserModel {
@@ -25,10 +37,6 @@ func NewBaseUserModel(user *model.User) *BaseUserModel {
 		Birth_date: user.Birth_date,
 		Telephone: user.Telephone,
 	}
-}
-
-type CreateUserRequest struct {
-	*BaseUserModel
 }
 
 func (request *CreateUserRequest) ToUser() *model.User {

@@ -2,6 +2,8 @@ package main
 
 import (
 	"symphony-api/internal/handlers"
+	community_handlers "symphony-api/internal/handlers/community"
+	user_handlers "symphony-api/internal/handlers/users"
 	"symphony-api/internal/persistence/connectors/mongo"
 
 	//"symphony-api/internal/persistence/connectors/neo4j"
@@ -14,17 +16,17 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-// @title Symphony API
-// @version 1.0
-// @description API for Symphony application, which is an social media created for educational purposes, focusing on music.
+//	@title			Symphony API
+//	@version		1.0
+//	@description	API for Symphony application, which is an social media created for educational purposes, focusing on music.
 func main() {
 	postgresConnection := postgres.NewPostgreConnection()
 	_ = mongo.NewMongoConnection()
 	//_ = neo4j.NewNeo4jConnection()
 
-	userCrud := handlers.NewUserCrud(postgresConnection)
+	userCrud := user_handlers.NewUserHandler(postgresConnection)
 	postCrud := handlers.NewPostCrud(postgresConnection)
-	communityCrud := handlers.NewCommunityCrud(postgresConnection)
+	communityCrud := community_handlers.NewCommunityHandler(postgresConnection)
 
 	// Create a new server instance
 	srv := server.NewServer(config.GetEnv("API_PORT", "8080"))

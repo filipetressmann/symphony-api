@@ -5,7 +5,8 @@ import (
 	"symphony-api/internal/persistence/model"
 )
 
-var POST_TABLE = "post"
+const POST_TABLE = "post"
+const POST_ID = "id"
 
 type PostRepository struct {
 	connection postgres.PostgreConnection
@@ -18,9 +19,9 @@ func NewPostRepository(connection postgres.PostgreConnection) *PostRepository {
 }
 
 func (repository *PostRepository) Put(post *model.Post) (*model.Post, error) {
-	id, err := repository.connection.Put(post.ToMap(), POST_TABLE)
+	id, err := repository.connection.PutReturningId(post.ToMap(), POST_TABLE, POST_ID)
 	return model.NewPost(
-		id,
+		id.(int32),
 		post.UserId,
 		post.Text,
 		post.UrlFoto,

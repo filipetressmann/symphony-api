@@ -5,7 +5,7 @@ import (
 )
 
 type CreatePostRequest struct {
-	UserId int32 `json:"user_id"`
+	UserId int32 `json:"user_id" binding:"required"`
 	*BasePostModel
 }
 
@@ -19,9 +19,9 @@ func (request *CreatePostRequest) ToPost() *model.Post {
 }
 
 type BasePostModel struct {
-	Text      string `json:"text"`
-	UrlFoto   string `json:"url_foto"`
-	LikeCount int    `json:"like_count"`
+	Text      string `json:"text" binding:"required"`
+	UrlFoto   string `json:"url_foto" binding:"required"`
+	LikeCount int    `json:"like_count" binding:"required"`
 }
 
 func NewBasePostModel(post *model.Post) *BasePostModel {
@@ -52,7 +52,7 @@ func NewCreatePostResponse(post *model.Post) *CreatePostResponse {
 
 type PostResponse struct {
 	*BasePostModel
-	Id int32 `json:"id"`
+	Id int32 `json:"id" binding:"required"`
 }
 
 func NewPostResponse(post *model.Post) *PostResponse {
@@ -63,12 +63,12 @@ func NewPostResponse(post *model.Post) *PostResponse {
 }
 
 type GetPostByIdRequest struct {
-	PostId int32 `json:"post_id"`
+	PostId int32 `json:"post_id" binding:"required"`
 }
 
 type GetPostByIdResponse struct {
-	Id     int32 `json:"id"`
-	UserId int32 `json:"user_id"`
+	Id     int32 `json:"id" binding:"required"`
+	UserId int32 `json:"user_id" binding:"required"`
 	*BasePostModel
 }
 
@@ -81,11 +81,11 @@ func NewGetPostByIdResponse(post *model.Post) *GetPostByIdResponse {
 }
 
 type GetPostsByUserIdRequest struct {
-	UserId int32 `json:"user_id"`
+	UserId int32 `json:"user_id" binding:"required"`
 }
 
 type GetPostsByUserIdResponse struct {
-	Posts []*PostResponse `json:"posts"`
+	Posts []*PostResponse `json:"posts" binding:"required"`
 }
 
 func NewGetPostsByUserIdResponse(posts []*model.Post) *GetPostsByUserIdResponse {

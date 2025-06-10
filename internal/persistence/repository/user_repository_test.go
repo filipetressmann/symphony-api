@@ -10,26 +10,11 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockPostgreConnection struct {
-	mock.Mock
-}
-
-func (m *MockPostgreConnection) Put(data map[string]any, table string) (int32, error) {
-	args := m.Called(data, table)
-	return int32(args.Int(0)), nil
-}
-
-func (m *MockPostgreConnection) Get(constraint map[string]any, table string) ([]map[string]any, error) {
-	args := m.Called(constraint, table)
-	return args.Get(0).([]map[string]any), nil
-}
-
 func TestUserRepository_Put(t *testing.T) {
-	mockConn := &MockPostgreConnection{}
+	mockConn := new(MockPostgreConnection)
 	repo := NewUserRepository(mockConn)
 
 	user := &model.User{
-		UserId:       1,
 		Username:     "john",
 		Fullname:     "John Doe",
 		Email:        "john@example.com",
@@ -38,11 +23,11 @@ func TestUserRepository_Put(t *testing.T) {
 		Telephone:    "123456789",
 	}
 
-	mockConn.On("Put", mock.Anything, USER_TABLE_NAME).Return(1)
+	mockConn.On("Put", mock.Anything, USER_TABLE_NAME).Return(nil)
 
-	result, _ := repo.Put(user)
+	err := repo.Put(user)
 
-	assert.Equal(t, int32(1), result.UserId)
+	assert.NoError(t, err)
 
 	mockConn.AssertExpectations(t)
 }
@@ -70,7 +55,7 @@ func TestUserRepository_GetById(t *testing.T) {
 
 	user, userMap := getFetchTestData()
 
-	mockConn.On("Get", mock.Anything, USER_TABLE_NAME).Return([]map[string]any{userMap})
+	mockConn.On("Get", mock.Anything, USER_TABLE_NAME).Return([]map[string]any{userMap}, nil)
 
 	result, _ := repo.GetById(1)
 
@@ -84,7 +69,7 @@ func TestUserRepository_GetByUsername(t *testing.T) {
 
 	user, userMap := getFetchTestData()
 
-	mockConn.On("Get",  mock.Anything, USER_TABLE_NAME).Return([]map[string]any{userMap})
+	mockConn.On("Get",  mock.Anything, USER_TABLE_NAME).Return([]map[string]any{userMap}, nil)
 
 	result, _ := repo.GetByUsername("john")
 

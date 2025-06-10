@@ -15,6 +15,214 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/community/add_user": {
+            "post": {
+                "description": "Adds a user to a community based on the username and community name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community"
+                ],
+                "summary": "Add a user to a community",
+                "parameters": [
+                    {
+                        "description": "Community data",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request_model.AddUserToCommunityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.SuccessCreationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/community/create": {
+            "post": {
+                "description": "Creates a new community in the system.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community"
+                ],
+                "summary": "Create a new community",
+                "parameters": [
+                    {
+                        "description": "Community data",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request_model.CreateCommunityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.SuccessCreationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/community/get_by_name": {
+            "post": {
+                "description": "Returns the coomunity data based on the name.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community"
+                ],
+                "summary": "Returns community data",
+                "parameters": [
+                    {
+                        "description": "Community data",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request_model.GetCommunityByNameRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.CommunityDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/community/list_users": {
+            "post": {
+                "description": "List all user data of a community",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "community"
+                ],
+                "summary": "List user of a community",
+                "parameters": [
+                    {
+                        "description": "Community data",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request_model.ListUsersOfCommunityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.ListUsersOfCommunityResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/create-post": {
             "post": {
                 "description": "Creates a new post in the system.",
@@ -228,6 +436,110 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/user/get_by_username": {
+            "post": {
+                "description": "Return user data based on their username",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get a user by its name",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request_model.GetUserByUsernameRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/list_communities": {
+            "post": {
+                "description": "Return all communities a user is part of",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get all communities of a user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request_model.ListUserCommunitiesRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.ListUserCommunitiesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -257,8 +569,63 @@ const docTemplate = `{
                 }
             }
         },
+        "request_model.AddUserToCommunityRequest": {
+            "type": "object",
+            "required": [
+                "community_name",
+                "username"
+            ],
+            "properties": {
+                "community_name": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "request_model.CommunityDataResponse": {
+            "type": "object",
+            "required": [
+                "community_name",
+                "created_at",
+                "description"
+            ],
+            "properties": {
+                "community_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                }
+            }
+        },
+        "request_model.CreateCommunityRequest": {
+            "type": "object",
+            "required": [
+                "community_name",
+                "description"
+            ],
+            "properties": {
+                "community_name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                }
+            }
+        },
         "request_model.CreatePostRequest": {
             "type": "object",
+            "required": [
+                "like_count",
+                "text",
+                "url_foto",
+                "user_id"
+            ],
             "properties": {
                 "like_count": {
                     "type": "integer"
@@ -276,6 +643,11 @@ const docTemplate = `{
         },
         "request_model.CreatePostResponse": {
             "type": "object",
+            "required": [
+                "like_count",
+                "text",
+                "url_foto"
+            ],
             "properties": {
                 "like_count": {
                     "type": "integer"
@@ -288,8 +660,26 @@ const docTemplate = `{
                 }
             }
         },
+        "request_model.GetCommunityByNameRequest": {
+            "type": "object",
+            "required": [
+                "community_name"
+            ],
+            "properties": {
+                "community_name": {
+                    "type": "string"
+                }
+            }
+        },
         "request_model.GetPostByIdResponse": {
             "type": "object",
+            "required": [
+                "id",
+                "like_count",
+                "text",
+                "url_foto",
+                "user_id"
+            ],
             "properties": {
                 "id": {
                     "type": "integer"
@@ -310,6 +700,9 @@ const docTemplate = `{
         },
         "request_model.GetPostsByUserIdResponse": {
             "type": "object",
+            "required": [
+                "posts"
+            ],
             "properties": {
                 "posts": {
                     "type": "array",
@@ -319,8 +712,79 @@ const docTemplate = `{
                 }
             }
         },
+        "request_model.GetUserByUsernameRequest": {
+            "type": "object",
+            "required": [
+                "username"
+            ],
+            "properties": {
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "request_model.ListUserCommunitiesRequest": {
+            "type": "object",
+            "required": [
+                "username"
+            ],
+            "properties": {
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "request_model.ListUserCommunitiesResponse": {
+            "type": "object",
+            "required": [
+                "communities"
+            ],
+            "properties": {
+                "communities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request_model.CommunityDataResponse"
+                    }
+                }
+            }
+        },
+        "request_model.ListUsersOfCommunityRequest": {
+            "type": "object",
+            "required": [
+                "community_name",
+                "username"
+            ],
+            "properties": {
+                "community_name": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "request_model.ListUsersOfCommunityResponse": {
+            "type": "object",
+            "required": [
+                "users"
+            ],
+            "properties": {
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request_model.UserResponse"
+                    }
+                }
+            }
+        },
         "request_model.PostResponse": {
             "type": "object",
+            "required": [
+                "id",
+                "like_count",
+                "text",
+                "url_foto"
+            ],
             "properties": {
                 "id": {
                     "type": "integer"
@@ -332,6 +796,47 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "url_foto": {
+                    "type": "string"
+                }
+            }
+        },
+        "request_model.SuccessCreationResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "request_model.UserResponse": {
+            "type": "object",
+            "required": [
+                "birth_date",
+                "email",
+                "fullname",
+                "telephone",
+                "username"
+            ],
+            "properties": {
+                "birth_date": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "fullname": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "register_date": {
+                    "type": "string"
+                },
+                "telephone": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }

@@ -1,4 +1,4 @@
-package repository_test
+package repository
 
 import (
 	"errors"
@@ -8,29 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"symphony-api/internal/persistence/model"
-	"symphony-api/internal/persistence/repository"
 )
-
-// --- Mock for PostgreConnection ---
-type MockPostgreConnection struct {
-	mock.Mock
-}
-
-func (m *MockPostgreConnection) Put(data map[string]any, table string) (int32, error) {
-	args := m.Called(data, table)
-	return int32(args.Int(0)), args.Error(1)
-}
-
-func (m *MockPostgreConnection) Get(constraints map[string]any, table string) ([]map[string]any, error) {
-	args := m.Called(constraints, table)
-	return args.Get(0).([]map[string]any), args.Error(1)
-}
-
-// --- Tests ---
 
 func TestPut_Success(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
-	repo := repository.NewCommunityRepository(mockConn)
+	repo := NewCommunityRepository(mockConn)
 
 	input := &model.Community{
 		CommunityName: "TestCommunity",
@@ -39,22 +21,18 @@ func TestPut_Success(t *testing.T) {
 
 	// Expected table data map (simplified)
 	tableData := input.ToTableData()
-	mockConn.On("Put", tableData, "COMMUNITY").Return(123, nil)
+	mockConn.On("Put", tableData, "COMMUNITY").Return(nil)
 
-	result, err := repo.Put(input)
+	err := repo.Put(input)
 
 	assert.NoError(t, err)
-	assert.Equal(t, int32(123), result.Id)
-	assert.Equal(t, input.CommunityName, result.CommunityName)
-	assert.Equal(t, input.Description, result.Description)
-	assert.WithinDuration(t, time.Now(), result.CreatedAt, time.Second)
 
 	mockConn.AssertExpectations(t)
 }
 
 func TestGetByName_Success(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
-	repo := repository.NewCommunityRepository(mockConn)
+	repo := NewCommunityRepository(mockConn)
 
 	constraint := map[string]any{
 		"community_name": "TestCommunity",
@@ -83,7 +61,7 @@ func TestGetByName_Success(t *testing.T) {
 
 func TestGetByName_NotFound(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
-	repo := repository.NewCommunityRepository(mockConn)
+	repo := NewCommunityRepository(mockConn)
 
 	mockConn.On("Get", mock.Anything, "COMMUNITY").Return([]map[string]any{}, nil)
 
@@ -96,18 +74,17 @@ func TestGetByName_NotFound(t *testing.T) {
 
 func TestPut_Failure(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
-	repo := repository.NewCommunityRepository(mockConn)
+	repo := NewCommunityRepository(mockConn)
 
 	input := &model.Community{
 		CommunityName: "ErrorCommunity",
 		Description:   "This will fail",
 	}
 
-	mockConn.On("Put", input.ToTableData(), "COMMUNITY").Return(0, errors.New("db error"))
+	mockConn.On("Put", input.ToTableData(), "COMMUNITY").Return(errors.New("db error"))
 
-	result, err := repo.Put(input)
+	err := repo.Put(input)
 
 	assert.Error(t, err)
-	assert.Empty(t, result)
 	mockConn.AssertExpectations(t)
 }

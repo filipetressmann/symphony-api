@@ -6,21 +6,35 @@ import (
 )
 
 type BaseCommunityData struct {
-	CommunityName string `json:"community_name"`
-	Description string `json:"description"`
+	CommunityName string `json:"community_name" binding:"required"`
+	Description string `json:"description" binding:"required"`
 }
 
 type CreateCommunityRequest struct {
 	*BaseCommunityData
 }
 
-type CommunityDataResponse struct {
-	*BaseCommunityData
-	CreatedAt time.Time `json:"created_at"`
+type GetCommunityByNameRequest struct {
+	CommunityName string `json:"community_name" binding:"required"`
 }
 
-type GetCommunityByNameRequest struct {
-	CommunityName string `json:"community_name"`
+type AddUserToCommunityRequest struct {
+	CommunityName string `json:"community_name" binding:"required"`
+	Username string `json:"username" binding:"required"`
+}
+
+type ListUsersOfCommunityRequest struct {
+	CommunityName string `json:"community_name" binding:"required"`
+	Username string `json:"username" binding:"required"`
+}
+
+type ListUsersOfCommunityResponse struct {
+	Users []*UserResponse `json:"users" binding:"required"`
+}
+
+type CommunityDataResponse struct {
+	*BaseCommunityData
+	CreatedAt time.Time `json:"created_at" binding:"required"`
 }
 
 func (request *CreateCommunityRequest) ToCommunity() *model.Community {

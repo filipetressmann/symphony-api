@@ -26,15 +26,23 @@ func NewCommunityFromMap(data map[string]any) *Community {
 }
 
 func NewCommunity(
-	id int32,
 	communityName string,
 	description string,
 	createdAt time.Time,
 ) *Community {
 	return &Community{
-		Id: id,
 		CommunityName: communityName,
 		Description: description,
 		CreatedAt: createdAt,
 	}
+}
+
+func MapArrayToCommunity(data []map[string]any) []*Community {
+	communities := make([]*Community, 0)
+
+	for _, community := range data {
+		communities = append(communities, NewCommunityFromMap(community))
+	}
+
+	return communities
 }

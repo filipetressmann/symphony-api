@@ -9,7 +9,7 @@ import (
 
 func TestNewUser(t *testing.T) {
 	birthDate := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
-	u := NewUser(0, "johndoe", "John Doe", "john@example.com", birthDate, "123456789")
+	u := NewUser("johndoe", "John Doe", "john@example.com", birthDate, "123456789")
 
 	assert.NotNil(t, u)
 	assert.Equal(t, int32(0), u.UserId)
@@ -23,7 +23,7 @@ func TestNewUser(t *testing.T) {
 
 func TestUserToMap(t *testing.T) {
 	birthDate := time.Date(1995, 6, 15, 0, 0, 0, 0, time.UTC)
-	u := NewUser(0, "alice", "Alice Smith", "alice@example.com", birthDate, "987654321")
+	u := NewUser("alice", "Alice Smith", "alice@example.com", birthDate, "987654321")
 
 	m := u.ToMap()
 

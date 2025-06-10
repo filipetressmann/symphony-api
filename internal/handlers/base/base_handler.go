@@ -1,15 +1,14 @@
-package handlers
+package base_handlers
 
 import (
 	"net/http"
-	request_model "symphony-api/internal/handlers/model"
 )
 
-func createHandler[In any, Out any](
+func CreateHandler[In any, Out any](
 	handler func(In) (Out, error),
 	) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		request, err := request_model.MapRequest[In](r)
+		request, err := MapRequest[In](r)
 
 		if err != nil {
         	http.Error(w, "Invalid Input", http.StatusBadRequest)
@@ -23,6 +22,6 @@ func createHandler[In any, Out any](
 			return
 		}
 
-		request_model.MustEncodeAnswer(response, w)
+		MustEncodeAnswer(response, w)
 	}
 }

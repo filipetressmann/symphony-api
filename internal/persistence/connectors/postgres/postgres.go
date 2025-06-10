@@ -11,7 +11,8 @@ import (
 )
 
 type PostgreConnection interface {
-	Put(data map[string]any, tableName string) (int32, error)
+	Put(data map[string]any, tableName string) error
+	PutReturningId(data map[string]any, tableName string, idName string) (any, error)
 	Get(constraints map[string]any, tableName string) ([]map[string]any, error)
 }
 
@@ -39,10 +40,22 @@ func NewPostgreConnection() PostgreConnection {
 	}
 }
 
-func (conn *PostgreConnectionImpl) Put(data map[string]any, tableName string) (int32, error) {
-	var id int32
+func (conn *PostgreConnectionImpl) Put(data map[string]any, tableName string) error {
+	insertStatement, args := getInsertStament(data, tableName, nil)
+	log.Printf("Executing insert statement at Postgres: %s", insertStatement)
+	_, err := conn.Exec(
+		context.Background(),
+		insertStatement,
+		args...,
+	)
 
-	insertStatement, args := getInsertStament(data, tableName)
+	return err
+}
+
+func (conn *PostgreConnectionImpl) PutReturningId(data map[string]any, tableName string, idName string) (any, error) {
+	var id any
+
+	insertStatement, args := getInsertStament(data, tableName, &idName)
 	log.Printf("Executing insert statement at Postgres: %s", insertStatement)
 	err := conn.QueryRow(
 		context.Background(),
@@ -53,10 +66,16 @@ func (conn *PostgreConnectionImpl) Put(data map[string]any, tableName string) (i
 	return id, err
 }
 
-func getInsertStament(data map[string]any, tableName string) (string, []any) {
+func getInsertStament(data map[string]any, tableName string, idName *string) (string, []any) {
 	keys := make([]string, 0, len(data))
 	values := make([]any, 0, len(data))
 	placeholders := make([]string, 0, len(data))
+
+	baseInsert := "INSERT INTO %s (%s) VALUES (%s)"
+
+	if idName != nil {
+		baseInsert = fmt.Sprintf("%s RETURNING %s", baseInsert, *idName)
+	}
 
 	index := 1
 	for k, v := range data {
@@ -67,7 +86,7 @@ func getInsertStament(data map[string]any, tableName string) (string, []any) {
 	}
 
 	return fmt.Sprintf(
-		"INSERT INTO %s (%s) VALUES (%s) RETURNING id", 
+		baseInsert, 
 		tableName, 
 		joinComma(keys), 
 		joinComma(placeholders),
