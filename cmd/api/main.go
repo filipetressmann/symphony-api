@@ -4,6 +4,7 @@ import (
 	"symphony-api/internal/handlers"
 	community_handlers "symphony-api/internal/handlers/community"
 	user_handlers "symphony-api/internal/handlers/users"
+	chat_handlers "symphony-api/internal/handlers/chat"
 	"symphony-api/internal/persistence/connectors/mongo"
 
 	//"symphony-api/internal/persistence/connectors/neo4j"
@@ -12,7 +13,7 @@ import (
 	"symphony-api/pkg/config"
 
 	_ "symphony-api/docs"
-
+	
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -27,6 +28,7 @@ func main() {
 	userCrud := user_handlers.NewUserHandler(postgresConnection)
 	postCrud := handlers.NewPostCrud(postgresConnection)
 	communityCrud := community_handlers.NewCommunityHandler(postgresConnection)
+	chatCrud := chat_handlers.NewChatHandler(postgresConnection)
 
 	// Create a new server instance
 	srv := server.NewServer(config.GetEnv("API_PORT", "8080"))
@@ -36,6 +38,7 @@ func main() {
 	userCrud.AddRoutes(*srv)
 	postCrud.AddRoutes(*srv)
 	communityCrud.AddRoutes(*srv)
+	chatCrud.AddRoutes(*srv)
 
 	srv.AddRoute("/swagger/", httpSwagger.WrapHandler)
 
