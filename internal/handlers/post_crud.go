@@ -25,11 +25,11 @@ func NewPostCrud(connection postgres.PostgreConnection) *PostCrud {
 
 func (postCrud *PostCrud) AddRoutes(server server.Server) {
 	server.AddRoute(
-		"/api/create-post",
+		"/api/post/create-post",
 		base_handlers.CreateHandler(postCrud.CreatePostHandler),
 	)
 	server.AddRoute(
-		"/api/get-post-by-id",
+		"/api/post/get-post-by-id",
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			postId, err := strconv.ParseInt(r.URL.Query().Get("post_id"), 10, 32)
 			if err != nil {
@@ -49,7 +49,7 @@ func (postCrud *PostCrud) AddRoutes(server server.Server) {
 		}),
 	)
 	server.AddRoute(
-		"/api/get-posts-by-user-id",
+		"/api/post/get-posts-by-user-id",
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			userId, err := strconv.ParseInt(r.URL.Query().Get("user_id"), 10, 32)
 			if err != nil {
@@ -80,7 +80,7 @@ func (postCrud *PostCrud) AddRoutes(server server.Server) {
 //	@Success		200		{object}	request_model.CreatePostResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/create-post [post]
+//	@Router			/api/post/create-post [post]
 func (postCrud *PostCrud) CreatePostHandler(request request_model.CreatePostRequest) (*request_model.CreatePostResponse, error) {
 	log.Printf("CreatePostHandler called with request: %+v", request)
 	createdPost, err := postCrud.repository.Put(request.ToPost())
@@ -104,7 +104,7 @@ func (postCrud *PostCrud) CreatePostHandler(request request_model.CreatePostRequ
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		404		{object}	map[string]string	"Post Not Found"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/get-post-by-id [get]
+//	@Router			/api/post/get-post-by-id [get]
 func (postCrud *PostCrud) GetPostByIdHandler(request request_model.GetPostByIdRequest) (*request_model.GetPostByIdResponse, error) {
 	post, err := postCrud.repository.GetById(request.PostId)
 	if err != nil {
@@ -124,7 +124,7 @@ func (postCrud *PostCrud) GetPostByIdHandler(request request_model.GetPostByIdRe
 //	@Success		200		{object}	request_model.GetPostsByUserIdResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/get-posts-by-user-id [get]
+//	@Router			/api/post/get-posts-by-user-id [get]
 func (postCrud *PostCrud) GetPostsByUserIdHandler(request request_model.GetPostsByUserIdRequest) (*request_model.GetPostsByUserIdResponse, error) {
 	posts, err := postCrud.repository.GetByUserId(request.UserId)
 	if err != nil {

@@ -66,7 +66,7 @@ func (handler *CommunityHandler) CreateCommunity(request request_model.CreateCom
 //	@Success		200		{object}	request_model.CommunityDataResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/community/get_by_name [post]
+//	@Router			/api/community/get_by_name [get]
 func (handler *CommunityHandler) GetCommunityByName(request request_model.GetCommunityByNameRequest) (*request_model.CommunityDataResponse, error) {
 	community, err := handler.communityRepository.GetByName(request.CommunityName)
 
@@ -85,7 +85,7 @@ func (handler *CommunityHandler) GetCommunityByName(request request_model.GetCom
 //	@Tags			community
 //	@Accept			json
 //	@Produce		json
-//	@Param			post	body		request_model.AddUserToCommunityRequest	true	"Community data"
+//	@Param			post	body		request_model.AddUserToCommunityRequest	true	"User and Community data"
 //	@Success		200		{object}	request_model.SuccessCreationResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
@@ -101,11 +101,11 @@ func (handler *CommunityHandler) AddUserToCommunity(request request_model.AddUse
 //	@Tags			community
 //	@Accept			json
 //	@Produce		json
-//	@Param			post	body		request_model.ListUsersOfCommunityRequest	true	"Community data"
+//	@Param			community_name	query		string	true	"Community Name"1'
 //	@Success		200		{object}	request_model.ListUsersOfCommunityResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/community/list_users [post]
+//	@Router			/api/community/list_users [get]
 func (handler *CommunityHandler) ListUsersFromCommunity(request request_model.ListUsersOfCommunityRequest) (*request_model.ListUsersOfCommunityResponse, error) {
 	users, err := handler.communityService.ListUsersFromCommunity(request.CommunityName)
 

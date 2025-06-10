@@ -51,7 +51,7 @@ func (handler *UserHandler) AddRoutes(server server.Server) {
 //	@Success		200		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/create-user [post]
+//	@Router			/api/user/create-user [post]
 func (handler *UserHandler) CreateUserHandler(request request_model.CreateUserRequest) (*request_model.SuccessCreationResponse, error) {
 	
 	err := handler.repository.Put(request.ToUser())
@@ -75,7 +75,7 @@ func (handler *UserHandler) CreateUserHandler(request request_model.CreateUserRe
 //	@Success		200		{object}	request_model.UserResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/user/get_by_username [post]
+//	@Router			/api/user/get_by_username [get]
 func (handler *UserHandler) GetUserByUsername(request request_model.GetUserByUsernameRequest) (*request_model.UserResponse, error) {
 	user, err := handler.repository.GetByUsername(request.Username)
 
@@ -96,7 +96,7 @@ func (handler *UserHandler) GetUserByUsername(request request_model.GetUserByUse
 //	@Success		200		{object}	request_model.ListUserCommunitiesResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/user/list_communities [post]
+//	@Router			/api/user/list_communities [get]
 func (handler *UserHandler) ListUserCommunities(request request_model.ListUserCommunitiesRequest) (*request_model.ListUserCommunitiesResponse, error) {
 	communities, err := handler.communityService.ListCommunitiesOfUser(request.Username)
 
