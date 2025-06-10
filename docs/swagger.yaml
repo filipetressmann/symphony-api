@@ -26,6 +26,16 @@ definitions:
     - community_name
     - username
     type: object
+  request_model.BaseChatData:
+    properties:
+      chat_id:
+        type: integer
+      created_at:
+        type: string
+    required:
+    - chat_id
+    - created_at
+    type: object
   request_model.CommunityDataResponse:
     properties:
       community_name:
@@ -38,6 +48,16 @@ definitions:
     - community_name
     - created_at
     - description
+    type: object
+  request_model.CreateChatRequest:
+    properties:
+      username1:
+        type: string
+      username2:
+        type: string
+    required:
+    - username1
+    - username2
     type: object
   request_model.CreateCommunityRequest:
     properties:
@@ -77,6 +97,13 @@ definitions:
     - like_count
     - text
     - url_foto
+    type: object
+  request_model.GetChatByIdRequest:
+    properties:
+      chat_id:
+        type: integer
+    required:
+    - chat_id
     type: object
   request_model.GetCommunityByNameRequest:
     properties:
@@ -120,6 +147,22 @@ definitions:
     required:
     - username
     type: object
+  request_model.ListChatsFromUserRequest:
+    properties:
+      username:
+        type: string
+    required:
+    - username
+    type: object
+  request_model.ListChatsFromUserResponse:
+    properties:
+      chat_ids:
+        items:
+          type: integer
+        type: array
+    required:
+    - chat_ids
+    type: object
   request_model.ListUserCommunitiesRequest:
     properties:
       username:
@@ -135,6 +178,33 @@ definitions:
         type: array
     required:
     - communities
+    type: object
+  request_model.ListUsersFromChatRequest:
+    properties:
+      chat_id:
+        type: integer
+    required:
+    - chat_id
+    type: object
+  request_model.ListUsersFromChatResponse:
+    properties:
+      username1:
+        type: string
+      username2:
+        type: string
+    required:
+    - username1
+    - username2
+    type: object
+  request_model.ListUsersOfCommunityRequest:
+    properties:
+      community_name:
+        type: string
+      username:
+        type: string
+    required:
+    - community_name
+    - username
     type: object
   request_model.ListUsersOfCommunityResponse:
     properties:
@@ -196,6 +266,142 @@ info:
   title: Symphony API
   version: "1.0"
 paths:
+  /api/chat/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new chat between two users in the system.
+      parameters:
+      - description: Usernames of the users to create a chat between
+        in: body
+        name: usernames
+        required: true
+        schema:
+          $ref: '#/definitions/request_model.CreateChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.SuccessCreationResponse'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new chat
+      tags:
+      - chat
+  /api/chat/get_by_id:
+    get:
+      consumes:
+      - application/json
+      description: Returns chat data by its ID.
+      parameters:
+      - description: Chat ID
+        in: body
+        name: chat_id
+        required: true
+        schema:
+          $ref: '#/definitions/request_model.GetChatByIdRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.BaseChatData'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Returns chat data
+      tags:
+      - chat
+  /api/chat/list_chats:
+    get:
+      consumes:
+      - application/json
+      description: Returns the chat IDs for a user.
+      parameters:
+      - description: User data
+        in: body
+        name: user_id
+        required: true
+        schema:
+          $ref: '#/definitions/request_model.ListChatsFromUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.ListChatsFromUserResponse'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List chats from a user
+      tags:
+      - chat
+  /api/chat/list_users:
+    get:
+      consumes:
+      - application/json
+      description: Returns the users in a chat by its ID.
+      parameters:
+      - description: Chat ID
+        in: body
+        name: chat_id
+        required: true
+        schema:
+          $ref: '#/definitions/request_model.ListUsersFromChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request_model.ListUsersFromChatResponse'
+        "400":
+          description: Invalid Input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List users from a chat
+      tags:
+      - chat
   /api/community/add_user:
     post:
       consumes:
