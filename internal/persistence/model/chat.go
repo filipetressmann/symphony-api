@@ -17,10 +17,7 @@ func NewChat(chatId int32) *Chat {
 }
 
 func (chat *Chat) ToMap() map[string]any {
-	return map[string]any{
-		"chat_id": chat.ChatId,
-		"created_at": chat.CreatedAt,
-	}
+    return map[string]any{}
 }
 
 func MapToChat(data map[string]any) *Chat {

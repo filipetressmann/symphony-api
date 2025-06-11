@@ -9,6 +9,7 @@ import (
 const CHAT_TABLE_NAME = "CHAT"
 const USER_TO_CHAT_TABLE = "CHAT_PARTICIPANTS"
 const JOINED_USERS_AND_CHAT_PARTICIPANTS = "USERS u JOIN CHAT_PARTICIPANTS cp ON u.id = cp.user_id"
+const JOINED_CHATS_AND_PARTICIPANTS = "CHAT c JOIN CHAT_PARTICIPANTS cp ON c.chat_id = cp.chat_id"
 
 type ChatRepository struct {
 	connection postgres.PostgreConnection
@@ -21,7 +22,12 @@ func NewChatRepository(connection postgres.PostgreConnection) *ChatRepository {
 }
 
 func (repository *ChatRepository) Put(chat *model.Chat) error {
-	return repository.connection.Put(chat.ToMap(), CHAT_TABLE_NAME)
+    id, err := repository.connection.PutReturningId(map[string]any{}, CHAT_TABLE_NAME, "chat_id")
+    if err != nil {
+        return err
+    }
+    chat.ChatId = id.(int32)
+    return nil
 }
 
 func (repository *ChatRepository) GetByChatId(chatId int32) (*model.Chat, error) {
@@ -29,13 +35,13 @@ func (repository *ChatRepository) GetByChatId(chatId int32) (*model.Chat, error)
 		"chat_id": chatId,
 	}
 
-	chats, err := repository.connection.Get(constraint, CHAT_TABLE_NAME)
+	chat, err := repository.connection.Get(constraint, CHAT_TABLE_NAME)
 
-	if len(chats) == 0 {
+	if len(chat) == 0 {
 		return nil, errors.New("chat not found")
 	}
 
-	return model.MapToChat(chats[0]), err
+	return model.MapToChat(chat[0]), err
 }
 
 func (repository *ChatRepository) AddUserToChat(user *model.User, chat *model.Chat) error {
@@ -71,24 +77,24 @@ func (repository *ChatRepository) ListUsersFromChat(chat *model.Chat) ([]*model.
 }
 
 func (repository *ChatRepository) ListChatsByUser(user *model.User) ([]*model.Chat, error) {
-	constraint := map[string]any{
-		"cp.user_id": user.UserId,
-	}
+    constraint := map[string]any{
+        "cp.user_id": user.UserId,
+    }
 
-	chats, err := repository.connection.Get(
-		constraint,
-		JOINED_USERS_AND_CHAT_PARTICIPANTS,
-	)
+    chatsData, err := repository.connection.Get(
+        constraint,
+        JOINED_CHATS_AND_PARTICIPANTS,
+    )
 
-	if err != nil {
-		return nil, err
-	}
+    if err != nil {
+        return nil, err
+    }
 
-	var chatList []*model.Chat
-	for _, chatData := range chats {
-		chatList = append(chatList, model.MapToChat(chatData))
-	}
+    var chatList []*model.Chat
+    for _, chatData := range chatsData {
+        chatList = append(chatList, model.MapToChat(chatData))
+    }
 
-	return chatList, nil
+    return chatList, nil
 }
 

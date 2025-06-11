@@ -42,12 +42,5 @@ func NewBaseChatData(chatId int32, createdAt time.Time) *BaseChatData {
 	}
 }
 
-func NewChatDataResponse(chatId int32, createdAt time.Time) *BaseChatData {
-	return &BaseChatData{
-		ChatId: chatId,
-		CreatedAt: createdAt,
-	}
-}
-
 
 
