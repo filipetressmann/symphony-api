@@ -429,7 +429,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/post/create-post": {
+        "/api/post/create": {
             "post": {
                 "description": "Creates a new post in the system.",
                 "consumes": [

@@ -25,7 +25,7 @@ func NewPostCrud(connection postgres.PostgreConnection) *PostCrud {
 
 func (postCrud *PostCrud) AddRoutes(server server.Server) {
 	server.AddRoute(
-		"/api/post/create-post",
+		"/api/post/create",
 		base_handlers.CreateHandler(postCrud.CreatePostHandler),
 	)
 	server.AddRoute(
@@ -80,7 +80,7 @@ func (postCrud *PostCrud) AddRoutes(server server.Server) {
 //	@Success		200		{object}	request_model.CreatePostResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/post/create-post [post]
+//	@Router			/api/post/create [post]
 func (postCrud *PostCrud) CreatePostHandler(request request_model.CreatePostRequest) (*request_model.CreatePostResponse, error) {
 	log.Printf("CreatePostHandler called with request: %+v", request)
 	createdPost, err := postCrud.repository.Put(request.ToPost())
