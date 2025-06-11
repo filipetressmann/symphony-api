@@ -528,7 +528,7 @@ paths:
       summary: List user of a community
       tags:
       - community
-  /api/post/create-post:
+  /api/post/create:
     post:
       consumes:
       - application/json
