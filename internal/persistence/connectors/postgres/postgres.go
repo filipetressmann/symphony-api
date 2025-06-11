@@ -67,6 +67,13 @@ func (conn *PostgreConnectionImpl) PutReturningId(data map[string]any, tableName
 }
 
 func getInsertStament(data map[string]any, tableName string, idName *string) (string, []any) {
+	if len(data) == 0 {
+        if idName != nil {
+            return fmt.Sprintf("INSERT INTO %s DEFAULT VALUES RETURNING %s", tableName, *idName), nil
+        }
+        return fmt.Sprintf("INSERT INTO %s DEFAULT VALUES", tableName), nil
+    }
+
 	keys := make([]string, 0, len(data))
 	values := make([]any, 0, len(data))
 	placeholders := make([]string, 0, len(data))
