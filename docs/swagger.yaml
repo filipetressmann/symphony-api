@@ -196,16 +196,6 @@ definitions:
     - username1
     - username2
     type: object
-  request_model.ListUsersOfCommunityRequest:
-    properties:
-      community_name:
-        type: string
-      username:
-        type: string
-    required:
-    - community_name
-    - username
-    type: object
   request_model.ListUsersOfCommunityResponse:
     properties:
       users:

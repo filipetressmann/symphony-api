@@ -225,111 +225,7 @@ const docTemplate = `{
         },
         "/api/community/add_user": {
             "post": {
-                "description": "Creates a new chat between two users in the system.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "chat"
-                ],
-                "summary": "Create a new chat",
-                "parameters": [
-                    {
-                        "description": "Community data",
-                        "name": "post",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request_model.CreateChatRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/request_model.SuccessCreationResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid Input",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/chat/get_by_id": {
-            "get": {
-                "description": "Returns chat data by its ID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "chat"
-                ],
-                "summary": "Returns chat data",
-                "parameters": [
-                    {
-                        "description": "Chat ID",
-                        "name": "chat_id",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request_model.GetChatByIdRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/request_model.BaseChatData"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid Input",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/community/get_by_name": {
-            "post": {
-                "description": "Returns the coomunity data based on the name.",
+                "description": "Adds a user to a community based on the username and community name",
                 "consumes": [
                     "application/json"
                 ],
@@ -379,9 +275,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/community/list_users": {
+        "/api/community/create": {
             "post": {
-                "description": "List all user data of a community",
+                "description": "Creates a new community in the system.",
                 "consumes": [
                     "application/json"
                 ],
@@ -399,7 +295,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request_model.ListUsersOfCommunityRequest"
+                            "$ref": "#/definitions/request_model.CreateCommunityRequest"
                         }
                     }
                 ],
@@ -431,9 +327,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/create-post": {
-            "post": {
-                "description": "Creates a new post in the system.",
+        "/api/community/get_by_name": {
+            "get": {
+                "description": "Returns the coomunity data based on the name.",
                 "consumes": [
                     "application/json"
                 ],
@@ -483,9 +379,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/create-user": {
-            "post": {
-                "description": "Creates a new user in the system.",
+        "/api/community/list_users": {
+            "get": {
+                "description": "List all user data of a community",
                 "consumes": [
                     "application/json"
                 ],
@@ -493,26 +389,23 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Post"
+                    "community"
                 ],
-                "summary": "Create a new user",
+                "summary": "List user of a community",
                 "parameters": [
                     {
-                        "description": "User data",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.User"
-                        }
+                        "type": "string",
+                        "description": "Community Name",
+                        "name": "community_name",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/request_model.ListUsersOfCommunityResponse"
                         }
                     },
                     "400": {
@@ -536,7 +429,59 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/get-post-by-id": {
+        "/api/post/create-post": {
+            "post": {
+                "description": "Creates a new post in the system.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Post"
+                ],
+                "summary": "Create a new post",
+                "parameters": [
+                    {
+                        "description": "Post data",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request_model.CreatePostRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/request_model.CreatePostResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/post/get-post-by-id": {
             "get": {
                 "description": "Retrieves a post using its unique identifier.",
                 "consumes": [
@@ -595,7 +540,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/get-posts-by-user-id": {
+        "/api/post/get-posts-by-user-id": {
             "get": {
                 "description": "Retrieves all posts created by a specific user.",
                 "consumes": [
@@ -645,8 +590,61 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/user/get_by_username": {
+        "/api/user/create-user": {
             "post": {
+                "description": "Creates a new user in the system.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create a new user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/get_by_username": {
+            "get": {
                 "description": "Return user data based on their username",
                 "consumes": [
                     "application/json"
@@ -1044,21 +1042,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username2": {
-                    "type": "string"
-                }
-            }
-        },
-        "request_model.ListUsersOfCommunityRequest": {
-            "type": "object",
-            "required": [
-                "community_name",
-                "username"
-            ],
-            "properties": {
-                "community_name": {
-                    "type": "string"
-                },
-                "username": {
                     "type": "string"
                 }
             }
