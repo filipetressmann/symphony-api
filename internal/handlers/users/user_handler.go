@@ -47,11 +47,11 @@ func (handler *UserHandler) AddRoutes(server server.Server) {
 //	@Tags			User
 //	@Accept			json
 //	@Produce		json
-//	@Param			user	body		model.User	true	"User data"
-//	@Success		200		{object}	map[string]interface{}
+//	@Param			user	body		request_model.CreateUserRequest	true	"User data"
+//	@Success		200		{object}	request_model.SuccessCreationResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/user/create-user [post]
+//	@Router			/api/user/create [post]
 func (handler *UserHandler) CreateUserHandler(request request_model.CreateUserRequest) (*request_model.SuccessCreationResponse, error) {
 	
 	err := handler.repository.Put(request.ToUser())

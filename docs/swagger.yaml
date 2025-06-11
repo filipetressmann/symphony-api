@@ -1,21 +1,4 @@
 definitions:
-  model.User:
-    properties:
-      birth_date:
-        type: string
-      email:
-        type: string
-      fullname:
-        type: string
-      register_date:
-        type: string
-      telephone:
-        type: string
-      userId:
-        type: integer
-      username:
-        type: string
-    type: object
   request_model.AddUserToCommunityRequest:
     properties:
       community_name:
@@ -97,6 +80,25 @@ definitions:
     - like_count
     - text
     - url_foto
+    type: object
+  request_model.CreateUserRequest:
+    properties:
+      birth_date:
+        type: string
+      email:
+        type: string
+      fullname:
+        type: string
+      telephone:
+        type: string
+      username:
+        type: string
+    required:
+    - birth_date
+    - email
+    - fullname
+    - telephone
+    - username
     type: object
   request_model.GetChatByIdRequest:
     properties:
@@ -634,7 +636,7 @@ paths:
       summary: Get posts by user ID
       tags:
       - Post
-  /api/user/create-user:
+  /api/user/create:
     post:
       consumes:
       - application/json
@@ -645,15 +647,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.User'
+          $ref: '#/definitions/request_model.CreateUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/request_model.SuccessCreationResponse'
         "400":
           description: Invalid Input
           schema:

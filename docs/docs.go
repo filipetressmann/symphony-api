@@ -590,7 +590,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/user/create-user": {
+        "/api/user/create": {
             "post": {
                 "description": "Creates a new user in the system.",
                 "consumes": [
@@ -610,7 +610,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/request_model.CreateUserRequest"
                         }
                     }
                 ],
@@ -618,8 +618,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/request_model.SuccessCreationResponse"
                         }
                     },
                     "400": {
@@ -749,32 +748,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "model.User": {
-            "type": "object",
-            "properties": {
-                "birth_date": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "fullname": {
-                    "type": "string"
-                },
-                "register_date": {
-                    "type": "string"
-                },
-                "telephone": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "integer"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
         "request_model.AddUserToCommunityRequest": {
             "type": "object",
             "required": [
@@ -892,6 +865,33 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "url_foto": {
+                    "type": "string"
+                }
+            }
+        },
+        "request_model.CreateUserRequest": {
+            "type": "object",
+            "required": [
+                "birth_date",
+                "email",
+                "fullname",
+                "telephone",
+                "username"
+            ],
+            "properties": {
+                "birth_date": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "fullname": {
+                    "type": "string"
+                },
+                "telephone": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
