@@ -48,7 +48,7 @@ func (handler *ChatHandler) CreateChat(request request_model.CreateChatRequest) 
 	err := handler.chatService.CreateChat(request.Username1, request.Username2)
 	if err != nil {
 		log.Printf("Error creating chat: %s", err)
-		return nil, errors.New("error creating chat")
+		return nil, err
 	}
 
 	return request_model.NewSuccessCreationResponse("Successfully created chat"), nil
@@ -69,7 +69,7 @@ func (handler *ChatHandler) GetChatById(request request_model.GetChatByIdRequest
 	chat, err := handler.chatService.GetChatById(request.ChatId)
 	if err != nil {
 		log.Printf("Error getting chat by ID: %s", err)
-		return nil, errors.New("error getting chat by ID")
+		return nil, err
 	}
 
 	return request_model.NewChatDataResponse(chat.ChatId, chat.CreatedAt), nil
@@ -91,7 +91,7 @@ func (handler *ChatHandler) ListUsersFromChat(request request_model.ListUsersFro
 	users, err := handler.chatService.ListUsersFromChat(request.ChatId)
 	if err != nil {
 		log.Printf("Error listing users from chat: %s", err)
-		return nil, errors.New("error listing users from chat")
+		return nil, err
 	}
 
 	if len(users) < 2 {
@@ -119,7 +119,7 @@ func (handler *ChatHandler) ListChatsFromUser(request request_model.ListChatsFro
 	chats, err := handler.chatService.ListChatsByUser(request.Username)
 	if err != nil {
 		log.Printf("Error listing chats from user: %s", err)
-		return nil, errors.New("error listing chats from user")
+		return nil, err
 	}
 
 	chatIds := make([]int32, len(chats))
