@@ -32,41 +32,41 @@ func (service *ChatService) GetChatById(chatId int32) (*model.Chat, error) {
 	return chat, nil
 }
 
-func (service *ChatService) CreateChat(username1, username2 string) error {
+func (service *ChatService) CreateChat(username1, username2 string) (*model.Chat, error) {
     if username1 == "" || username2 == "" {
-        return errors.New("both usernames must be provided")
+        return nil, errors.New("both usernames must be provided")
     }
     if username1 == username2 {
-        return errors.New("users must be different")
+        return nil, errors.New("users must be different")
     }
 
     user1, err := service.userRepository.GetByUsername(username1)
     if err != nil {
-        return errors.New("user does not exist: " + username1)
+        return nil, errors.New("user does not exist: " + username1)
     }
     user2, err := service.userRepository.GetByUsername(username2)
     if err != nil {
-        return errors.New("user does not exist: " + username2)
+        return nil, errors.New("user does not exist: " + username2)
     }
 
     chat := &model.Chat{}
     if err := service.chatRepository.Put(chat); err != nil {
-        return err
+        return nil, err
     }
 
     createdChat, err := service.chatRepository.GetByChatId(chat.ChatId)
     if err != nil {
-        return errors.New("could not retrieve created chat")
+        return nil, errors.New("could not retrieve created chat")
     }
 
     if err := service.chatRepository.AddUserToChat(user1, createdChat); err != nil {
-        return err
+        return nil, err
     }
     if err := service.chatRepository.AddUserToChat(user2, createdChat); err != nil {
-        return err
+        return nil, err
     }
 
-    return nil
+    return createdChat, nil
 }
 
 func (service *ChatService) ListUsersFromChat(chatId int32) ([]*model.User, error) {

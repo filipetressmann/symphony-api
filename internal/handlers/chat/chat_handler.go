@@ -1,8 +1,10 @@
 package chat_handlers
 
 import (
-	"errors"
 	"log"
+	"encoding/json"
+    "net/http"
+    "strconv"
 	base_handlers "symphony-api/internal/handlers/base"
 	request_model "symphony-api/internal/handlers/model"
 	"symphony-api/internal/persistence/connectors/postgres"
@@ -27,10 +29,10 @@ func NewChatHandler(connection postgres.PostgreConnection) *ChatHandler {
 }
 
 func (handler *ChatHandler) AddRoutes(server server.Server) {
-	server.AddRoute("/api/chat/create", base_handlers.CreateHandler(handler.CreateChat))
-	server.AddRoute("/api/chat/get_by_id", base_handlers.CreateHandler(handler.GetChatById))
-	server.AddRoute("/api/chat/list_users", base_handlers.CreateHandler(handler.ListUsersFromChat))
-	server.AddRoute("/api/chat/list_chats", base_handlers.CreateHandler(handler.ListChatsFromUser))
+    server.AddRoute("/api/chat/create", base_handlers.CreateHandler(handler.CreateChat))
+    server.AddRoute("/api/chat/get_by_id", handler.GetChatById)
+    server.AddRoute("/api/chat/list_users", handler.ListUsersFromChat)
+    server.AddRoute("/api/chat/list_chats", handler.ListChatsFromUser)
 }
 
 // CreateChat handles the creation of a new chat between two users.
@@ -44,90 +46,111 @@ func (handler *ChatHandler) AddRoutes(server server.Server) {
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
 //  @Router			/api/chat/create [post]
-func (handler *ChatHandler) CreateChat(request request_model.CreateChatRequest) (*request_model.SuccessCreationResponse, error) {
-	err := handler.chatService.CreateChat(request.Username1, request.Username2)
+func (handler *ChatHandler) CreateChat(request request_model.CreateChatRequest) (*request_model.BaseChatData, error) {
+	chat, err := handler.chatService.CreateChat(request.Username1, request.Username2)
 	if err != nil {
 		log.Printf("Error creating chat: %s", err)
 		return nil, err
 	}
 
-	return request_model.NewSuccessCreationResponse("Successfully created chat"), nil
+	return request_model.NewBaseChatData(chat.ChatId, chat.CreatedAt), nil
 }
 
-// GetChatById returns a chat by its ID.
-//	@Summary		Returns chat data
-//	@Description	Returns chat data by its ID.
+// GetChatById retrieves a chat by its ID
+//	@Summary		Get chat by ID
+//	@Description	Retrieves a chat by its ID.
 //	@Tags			chat
 //	@Accept			json
 //	@Produce		json
-//	@Param			chat_id	body		request_model.GetChatByIdRequest	true	"Chat ID"
+//	@Param			chat_id	query		int32	true	"ID of the chat to retrieve"
 //	@Success		200		{object}	request_model.BaseChatData
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
+//	@Failure		404		{object}	map[string]string	"Chat Not Found"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/chat/get_by_id [get]
-func (handler *ChatHandler) GetChatById(request request_model.GetChatByIdRequest) (*request_model.BaseChatData, error) {
-	chat, err := handler.chatService.GetChatById(request.ChatId)
-	if err != nil {
-		log.Printf("Error getting chat by ID: %s", err)
-		return nil, err
-	}
-
-	return request_model.NewChatDataResponse(chat.ChatId, chat.CreatedAt), nil
+//  @Router			/api/chat/get_by_id [get]
+func (handler *ChatHandler) GetChatById(w http.ResponseWriter, r *http.Request) {
+    chatIdStr := r.URL.Query().Get("chat_id")
+    chatId, err := strconv.Atoi(chatIdStr)
+    if err != nil {
+        http.Error(w, "invalid chat_id", http.StatusBadRequest)
+        return
+    }
+    chat, err := handler.chatService.GetChatById(int32(chatId))
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusNotFound)
+        return
+    }
+    resp := request_model.NewBaseChatData(chat.ChatId, chat.CreatedAt)
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(resp)
 }
 
-
-// ListUsersFromChat returns the users in a chat by its ID.
-//	@Summary		List users from a chat
-//	@Description	Returns the users in a chat by its ID.
+// ListUsersFromChat retrieves the usernames of the first two users in a chat.
+//	@Summary		List users from chat
+//	@Description	Retrieves the usernames of the first two users in a chat.
 //	@Tags			chat
 //	@Accept			json
 //	@Produce		json
-//	@Param			chat_id	body		request_model.ListUsersFromChatRequest	true	"Chat ID"
+//	@Param			chat_id	query		int32	true	"ID of the chat to list users from"
 //	@Success		200		{object}	request_model.ListUsersFromChatResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
+//	@Failure		404		{object}	map[string]string	"Chat Not Found"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
 //  @Router			/api/chat/list_users [get]
-func (handler *ChatHandler) ListUsersFromChat(request request_model.ListUsersFromChatRequest) (*request_model.ListUsersFromChatResponse, error) {
-	users, err := handler.chatService.ListUsersFromChat(request.ChatId)
-	if err != nil {
-		log.Printf("Error listing users from chat: %s", err)
-		return nil, err
-	}
-
-	if len(users) < 2 {
-		return nil, errors.New("not enough users in chat")
-	}
-
-	return &request_model.ListUsersFromChatResponse{
-		Username1: users[0].Username,
-		Username2: users[1].Username,
-	}, nil
+func (handler *ChatHandler) ListUsersFromChat(w http.ResponseWriter, r *http.Request) {
+    chatIdStr := r.URL.Query().Get("chat_id")
+    chatId, err := strconv.Atoi(chatIdStr)
+    if err != nil {
+        http.Error(w, "invalid chat_id", http.StatusBadRequest)
+        return
+    }
+    users, err := handler.chatService.ListUsersFromChat(int32(chatId))
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusNotFound)
+        return
+    }
+    if len(users) < 2 {
+        http.Error(w, "not enough users in chat", http.StatusBadRequest)
+        return
+    }
+    resp := request_model.ListUsersFromChatResponse{
+        Username1: users[0].Username,
+        Username2: users[1].Username,
+    }
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(resp)
 }
 
-// ListChatsFromUser returns the chat IDs for a user.
-//	@Summary		List chats from a user
-//	@Description	Returns the chat IDs for a user.
+// ListChatsFromUser retrieves all chat IDs associated with a specific user.
+//	@Summary		List chats from user
+//	@Description	Retrieves all chat IDs associated with a specific user.
 //	@Tags			chat
 //	@Accept			json
 //	@Produce		json
-//	@Param			user_id	body		request_model.ListChatsFromUserRequest	true	"User data"
+//	@Param			username	query		string	true	"Username of the user to list chats from"
 //	@Success		200		{object}	request_model.ListChatsFromUserResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
+//	@Failure		404		{object}	map[string]string	"User Not Found"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
 //  @Router			/api/chat/list_chats [get]
-func (handler *ChatHandler) ListChatsFromUser(request request_model.ListChatsFromUserRequest) (*request_model.ListChatsFromUserResponse, error) {
-	chats, err := handler.chatService.ListChatsByUser(request.Username)
-	if err != nil {
-		log.Printf("Error listing chats from user: %s", err)
-		return nil, err
-	}
-
-	chatIds := make([]int32, len(chats))
-	for i, chat := range chats {
-		chatIds[i] = chat.ChatId
-	}
-
-	return &request_model.ListChatsFromUserResponse{
-		ChatIds: chatIds,
-	}, nil
+func (handler *ChatHandler) ListChatsFromUser(w http.ResponseWriter, r *http.Request) {
+    username := r.URL.Query().Get("username")
+    if username == "" {
+        http.Error(w, "username required", http.StatusBadRequest)
+        return
+    }
+    chats, err := handler.chatService.ListChatsByUser(username)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusNotFound)
+        return
+    }
+    chatIds := make([]int32, len(chats))
+    for i, chat := range chats {
+        chatIds[i] = chat.ChatId
+    }
+    resp := request_model.ListChatsFromUserResponse{
+        ChatIds: chatIds,
+    }
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(resp)
 }
