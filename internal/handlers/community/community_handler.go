@@ -28,10 +28,10 @@ func NewCommunityHandler(connection postgres.PostgreConnection) *CommunityHandle
 }
 
 func (handler *CommunityHandler) AddRoutes(server server.Server) {
-	server.AddRoute("/api/community/create", base_handlers.CreateHandler(handler.CreateCommunity))
-	server.AddRoute("/api/community/get_by_name", base_handlers.CreateHandler(handler.GetCommunityByName))
-	server.AddRoute("/api/community/add_user", base_handlers.CreateHandler(handler.AddUserToCommunity))
-	server.AddRoute("/api/community/list_users", base_handlers.CreateHandler(handler.ListUsersFromCommunity))
+	server.AddRoute("/api/community/create", base_handlers.CreatePostMethodHandler(handler.CreateCommunity))
+	server.AddRoute("/api/community/get_by_name", base_handlers.CreateGetMethodHandler(handler.GetCommunityByName))
+	server.AddRoute("/api/community/add_user", base_handlers.CreatePostMethodHandler(handler.AddUserToCommunity))
+	server.AddRoute("/api/community/list_users", base_handlers.CreateGetMethodHandler(handler.ListUsersFromCommunity))
 }
 
 // CreateCommunity handles the creation of a new community.

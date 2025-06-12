@@ -1,11 +1,8 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"log"
-	"net/http"
-	"strconv"
 	base_handlers "symphony-api/internal/handlers/base"
 	request_model "symphony-api/internal/handlers/model"
 	"symphony-api/internal/persistence/connectors/postgres"
@@ -26,47 +23,15 @@ func NewPostCrud(connection postgres.PostgreConnection) *PostCrud {
 func (postCrud *PostCrud) AddRoutes(server server.Server) {
 	server.AddRoute(
 		"/api/post/create",
-		base_handlers.CreateHandler(postCrud.CreatePostHandler),
+		base_handlers.CreatePostMethodHandler(postCrud.CreatePostHandler),
 	)
 	server.AddRoute(
 		"/api/post/get-post-by-id",
-		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			postId, err := strconv.ParseInt(r.URL.Query().Get("post_id"), 10, 32)
-			if err != nil {
-				http.Error(w, "Invalid post ID", http.StatusBadRequest)
-				return
-			}
-			request := request_model.GetPostByIdRequest{PostId: int32(postId)}
-			response, err := postCrud.GetPostByIdHandler(request)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			if err := json.NewEncoder(w).Encode(response); err != nil {
-				http.Error(w, "Error encoding response", http.StatusInternalServerError)
-				return
-			}
-		}),
+		base_handlers.CreateGetMethodHandler(postCrud.GetPostByIdHandler),
 	)
 	server.AddRoute(
 		"/api/post/get-posts-by-user-id",
-		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			userId, err := strconv.ParseInt(r.URL.Query().Get("user_id"), 10, 32)
-			if err != nil {
-				http.Error(w, "Invalid user ID", http.StatusBadRequest)
-				return
-			}
-			request := request_model.GetPostsByUserIdRequest{UserId: int32(userId)}
-			response, err := postCrud.GetPostsByUserIdHandler(request)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			if err := json.NewEncoder(w).Encode(response); err != nil {
-				http.Error(w, "Error encoding response", http.StatusInternalServerError)
-				return
-			}
-		}),
+		base_handlers.CreateGetMethodHandler(postCrud.GetPostsByUserIdHandler),
 	)
 }
 

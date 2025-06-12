@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/schema"
 )
 
 func MapRequest[T any](r *http.Request) (*T, error) {
@@ -14,6 +16,22 @@ func MapRequest[T any](r *http.Request) (*T, error) {
 		log.Printf("Request body: %v", r.Body)
 		return nil, err
 	}
+
+	return request, nil
+}
+
+func MapUrlValues[T any](r *http.Request) (*T, error) {
+	request := new(T)
+
+	decoder := schema.NewDecoder()
+    decoder.IgnoreUnknownKeys(true)
+
+    err := decoder.Decode(request, r.URL.Query())
+    if err != nil {
+        log.Printf("Error decoding request url: %v", err)
+		log.Printf("Request url: %v", r.URL)
+		return nil, err
+    }
 
 	return request, nil
 }

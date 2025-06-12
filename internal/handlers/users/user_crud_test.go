@@ -55,7 +55,7 @@ func TestCreateUserHandler(t *testing.T) {
 	req := httptest.NewRequest("POST", "/api/create-user", bytes.NewBuffer(requestBody))
 	w := httptest.NewRecorder()
 
-	handler := base_handlers.CreateHandler(userCrud.CreateUserHandler)
+	handler := base_handlers.CreatePostMethodHandler(userCrud.CreateUserHandler)
 	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -93,7 +93,7 @@ func TestGetUserByUsername(t *testing.T) {
 	req := httptest.NewRequest("POST", "/api/get-user-by-username", bytes.NewBuffer(requestBody))
 	w := httptest.NewRecorder()
 
-	handler := base_handlers.CreateHandler(userCrud.GetUserByUsername)
+	handler := base_handlers.CreateGetMethodHandler(userCrud.GetUserByUsername)
 	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)

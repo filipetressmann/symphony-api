@@ -12,8 +12,6 @@ import (
 	"symphony-api/internal/server"
 	"symphony-api/pkg/config"
 
-	_ "symphony-api/tmp/docs"
-	
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
