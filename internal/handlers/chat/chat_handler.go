@@ -1,31 +1,31 @@
 package chat_handlers
 
 import (
-	"log"
-	"encoding/json"
+    "log"
+    "encoding/json"
     "net/http"
     "strconv"
-	base_handlers "symphony-api/internal/handlers/base"
-	request_model "symphony-api/internal/handlers/model"
-	"symphony-api/internal/persistence/connectors/postgres"
-	"symphony-api/internal/persistence/repository"
-	"symphony-api/internal/persistence/service"
-	"symphony-api/internal/server"
+    base_handlers "symphony-api/internal/handlers/base"
+    request_model "symphony-api/internal/handlers/model"
+    "symphony-api/internal/persistence/connectors/postgres"
+    "symphony-api/internal/persistence/repository"
+    "symphony-api/internal/persistence/service"
+    "symphony-api/internal/server"
 )
 
 type ChatHandler struct {
-	chatRepository   *repository.ChatRepository
-	chatService      *service.ChatService
+    chatRepository   *repository.ChatRepository
+    chatService      *service.ChatService
 }
 
 func NewChatHandler(connection postgres.PostgreConnection) *ChatHandler {
-	chatRepository := repository.NewChatRepository(connection)
-	chatService := service.NewChatService(chatRepository, repository.NewUserRepository(connection))
+    chatRepository := repository.NewChatRepository(connection)
+    chatService := service.NewChatService(chatRepository, repository.NewUserRepository(connection))
 
-	return &ChatHandler{
-		chatRepository: chatRepository,
-		chatService:    chatService,
-	}
+    return &ChatHandler{
+        chatRepository: chatRepository,
+        chatService:    chatService,
+    }
 }
 
 func (handler *ChatHandler) AddRoutes(server server.Server) {
@@ -47,13 +47,13 @@ func (handler *ChatHandler) AddRoutes(server server.Server) {
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
 //  @Router			/api/chat/create [post]
 func (handler *ChatHandler) CreateChat(request request_model.CreateChatRequest) (*request_model.BaseChatData, error) {
-	chat, err := handler.chatService.CreateChat(request.Username1, request.Username2)
-	if err != nil {
-		log.Printf("Error creating chat: %s", err)
-		return nil, err
-	}
+    chat, err := handler.chatService.CreateChat(request.Username1, request.Username2)
+    if err != nil {
+        log.Printf("Error creating chat: %s", err)
+        return nil, err
+    }
 
-	return request_model.NewBaseChatData(chat.ChatId, chat.CreatedAt), nil
+    return request_model.NewBaseChatData(chat.ChatId, chat.CreatedAt), nil
 }
 
 // GetChatById retrieves a chat by its ID
@@ -82,7 +82,11 @@ func (handler *ChatHandler) GetChatById(w http.ResponseWriter, r *http.Request) 
     }
     resp := request_model.NewBaseChatData(chat.ChatId, chat.CreatedAt)
     w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(resp)
+    if err := json.NewEncoder(w).Encode(resp); err != nil {
+        log.Printf("Error encoding response: %v", err)
+        http.Error(w, "internal server error", http.StatusInternalServerError)
+        return
+    }
 }
 
 // ListUsersFromChat retrieves the usernames of the first two users in a chat.
@@ -118,7 +122,11 @@ func (handler *ChatHandler) ListUsersFromChat(w http.ResponseWriter, r *http.Req
         Username2: users[1].Username,
     }
     w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(resp)
+    if err := json.NewEncoder(w).Encode(resp); err != nil {
+        log.Printf("Error encoding response: %v", err)
+        http.Error(w, "internal server error", http.StatusInternalServerError)
+        return
+    }
 }
 
 // ListChatsFromUser retrieves all chat IDs associated with a specific user.
@@ -152,5 +160,9 @@ func (handler *ChatHandler) ListChatsFromUser(w http.ResponseWriter, r *http.Req
         ChatIds: chatIds,
     }
     w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(resp)
+    if err := json.NewEncoder(w).Encode(resp); err != nil {
+        log.Printf("Error encoding response: %v", err)
+        http.Error(w, "internal server error", http.StatusInternalServerError)
+        return
+    }
 }
