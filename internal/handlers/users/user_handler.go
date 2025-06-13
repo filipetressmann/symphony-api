@@ -29,15 +29,15 @@ func NewUserHandler(connection postgres.PostgreConnection) *UserHandler {
 func (handler *UserHandler) AddRoutes(server server.Server) {
 	server.AddRoute(
 		"/api/user/create", 
-		base_handlers.CreateHandler(handler.CreateUserHandler),
+		base_handlers.CreatePostMethodHandler(handler.CreateUserHandler),
 	)
 	server.AddRoute(
 		"/api/user/get_by_username", 
-		base_handlers.CreateHandler(handler.GetUserByUsername),
+		base_handlers.CreateGetMethodHandler(handler.GetUserByUsername),
 	)
 	server.AddRoute(
 		"/api/user/list_communities", 
-		base_handlers.CreateHandler(handler.ListUserCommunities),
+		base_handlers.CreateGetMethodHandler(handler.ListUserCommunities),
 	)
 }
 

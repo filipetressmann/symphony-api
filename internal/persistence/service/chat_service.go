@@ -49,6 +49,14 @@ func (service *ChatService) CreateChat(username1, username2 string) (*model.Chat
         return nil, errors.New("user does not exist: " + username2)
     }
 
+    existingChat, err := service.chatRepository.FindChatByUsers(user1.UserId, user2.UserId)
+    if err != nil {
+        return nil, err
+    }
+    if existingChat != nil {
+        return existingChat, nil
+    }
+
     chat := &model.Chat{}
     if err := service.chatRepository.Put(chat); err != nil {
         return nil, err

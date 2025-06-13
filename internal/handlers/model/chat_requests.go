@@ -15,11 +15,11 @@ type CreateChatRequest struct {
 }
 
 type GetChatByIdRequest struct {
-	ChatId int32 `json:"chat_id" binding:"required"`
+	ChatId int32 `schema:"chat_id,required"`
 }
 
 type ListUsersFromChatRequest struct {
-	ChatId int32 `json:"chat_id" binding:"required"`
+	ChatId int32 `schema:"chat_id,required"`
 }
 
 type ListUsersFromChatResponse struct {
@@ -28,7 +28,7 @@ type ListUsersFromChatResponse struct {
 }
 
 type ListChatsFromUserRequest struct {
-	Username string `json:"username" binding:"required"`
+	Username string `schema:"username,required"`
 }
 
 type ListChatsFromUserResponse struct {

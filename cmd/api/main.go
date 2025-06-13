@@ -13,7 +13,7 @@ import (
 	"symphony-api/pkg/config"
 
 	_ "symphony-api/tmp/docs"
-	
+
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 

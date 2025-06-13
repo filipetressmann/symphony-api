@@ -15,7 +15,7 @@ type CreateCommunityRequest struct {
 }
 
 type GetCommunityByNameRequest struct {
-	CommunityName string `json:"community_name" binding:"required"`
+	CommunityName string `schema:"community_name,required"`
 }
 
 type AddUserToCommunityRequest struct {
@@ -24,8 +24,7 @@ type AddUserToCommunityRequest struct {
 }
 
 type ListUsersOfCommunityRequest struct {
-	CommunityName string `json:"community_name" binding:"required"`
-	Username string `json:"username" binding:"required"`
+	CommunityName string `schema:"community_name,required"`
 }
 
 type ListUsersOfCommunityResponse struct {

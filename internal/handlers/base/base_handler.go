@@ -4,11 +4,20 @@ import (
 	"net/http"
 )
 
-func CreateHandler[In any, Out any](
+func CreatePostMethodHandler[In any, Out any](handler func(In) (Out, error),) http.HandlerFunc {
+	return createHandler(handler, MapRequest)
+}
+
+func CreateGetMethodHandler[In any, Out any](handler func(In) (Out, error)) http.HandlerFunc {
+	return createHandler(handler, MapUrlValues)
+}
+
+func createHandler[In any, Out any](
 	handler func(In) (Out, error),
+	mapper func(*http.Request) (*In, error),
 	) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		request, err := MapRequest[In](r)
+		request, err := mapper(r)
 
 		if err != nil {
         	http.Error(w, "Invalid Input", http.StatusBadRequest)

@@ -5,6 +5,7 @@ set -e
 timestamp=$(date +%s)
 community_name="test_community_$timestamp"
 username="test_user_$timestamp"
+username2="test_user_2_$timestamp"
 
 function post_and_assert() {
     local url=$1
@@ -33,9 +34,7 @@ post_and_assert "http://localhost:8080/api/community/create" "{
     \"description\": \"test\"
 }" "Create community"
 
-post_and_assert "http://localhost:8080/api/community/get_by_name" "{
-    \"community_name\": \"$community_name\"
-}" "Get community by name"
+post_and_assert "http://localhost:8080/api/community/get_by_name?community_name=$community_name" "{}" "Get community by name"
 
 post_and_assert "http://localhost:8080/api/user/create" "{
     \"username\": \"$username\",
@@ -45,22 +44,16 @@ post_and_assert "http://localhost:8080/api/user/create" "{
     \"birth_date\": \"2002-01-01T00:00:00Z\"
 }" "Create user"
 
-post_and_assert "http://localhost:8080/api/user/get_by_username" "{
-    \"username\": \"$username\"
-}" "Get user by username"
+post_and_assert "http://localhost:8080/api/user/get_by_username?username=$username" "{}" "Get user by username"
 
 post_and_assert "http://localhost:8080/api/community/add_user" "{
     \"username\": \"$username\",
     \"community_name\": \"$community_name\"
 }" "Add user to community"
 
-post_and_assert "http://localhost:8080/api/community/list_users" "{
-    \"community_name\": \"$community_name\"
-}" "List users in community"
+post_and_assert "http://localhost:8080/api/community/list_users?community_name=$community_name" "{}" "List users in community"
 
-post_and_assert "http://localhost:8080/api/user/list_communities" "{
-    \"username\": \"$username\"
-}" "List user communities"
+post_and_assert "http://localhost:8080/api/user/list_communities?username=$username" "{}" "List user communities"
 
 post_and_assert "http://localhost:8080/api/create-post" '{
     "user_id": 1, "text": "Hello world", "url_foto": "image.jpg"
@@ -69,5 +62,22 @@ post_and_assert "http://localhost:8080/api/create-post" '{
 post_and_assert "http://localhost:8080/api/get-post-by-id?post_id=1" "{}" "Get post"
 
 post_and_assert "http://localhost:8080/api/get-posts-by-user-id?user_id=1" "{}" "List user posts"
+
+post_and_assert "http://localhost:8080/api/user/create" "{
+    \"username\": \"$username2\",
+    \"fullname\": \"user da silva\",
+    \"email\": \"${username2}@example.com\",
+    \"telephone\": \"123456789\",
+    \"birth_date\": \"2002-01-01T00:00:00Z\"
+}" "Create user"
+
+post_and_assert "http://localhost:8080/api/chat/create" "{
+ \"username1\": \"$username\",
+ \"username2\": \"$username2\"
+}" "Create chat"
+
+post_and_assert "http://localhost:8080/api/chat/list_chats?username=$username" "{}" "List chat of user"
+
+post_and_assert "http://localhost:8080/api/chat/list_users?chat_id=1" "{}" "List users of chat"
 
 echo "🎉 All tests passed successfully!"

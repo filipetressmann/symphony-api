@@ -63,7 +63,7 @@ func NewPostResponse(post *model.Post) *PostResponse {
 }
 
 type GetPostByIdRequest struct {
-	PostId int32 `json:"post_id" binding:"required"`
+	PostId int32 `schema:"post_id,required"`
 }
 
 type GetPostByIdResponse struct {
@@ -81,7 +81,7 @@ func NewGetPostByIdResponse(post *model.Post) *GetPostByIdResponse {
 }
 
 type GetPostsByUserIdRequest struct {
-	UserId int32 `json:"user_id" binding:"required"`
+	UserId int32 `schema:"user_id,required"`
 }
 
 type GetPostsByUserIdResponse struct {

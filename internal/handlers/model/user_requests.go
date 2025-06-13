@@ -6,11 +6,11 @@ import (
 )
 
 type GetUserByUsernameRequest struct {
-	Username string `json:"username" binding:"required"`
+	Username string `schema:"username,required"`
 }
 
 type ListUserCommunitiesRequest struct {
-	Username string `json:"username" binding:"required"`
+	Username string `schema:"username,required"`
 }
 
 type ListUserCommunitiesResponse struct {
