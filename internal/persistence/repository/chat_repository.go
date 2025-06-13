@@ -98,3 +98,29 @@ func (repository *ChatRepository) ListChatsByUser(user *model.User) ([]*model.Ch
     return chatList, nil
 }
 
+func (repository *ChatRepository) FindChatByUsers(userId1, userId2 int32) (*model.Chat, error) {
+    user1 := &model.User{UserId: userId1}
+    chats, err := repository.ListChatsByUser(user1)
+    if err != nil {
+        return nil, err
+    }
+    for _, chat := range chats {
+        users, err := repository.ListUsersFromChat(chat)
+        if err != nil {
+            continue
+        }
+        found1, found2 := false, false
+        for _, u := range users {
+            if u.UserId == userId1 {
+                found1 = true
+            }
+            if u.UserId == userId2 {
+                found2 = true
+            }
+        }
+        if found1 && found2 && len(users) == 2 {
+            return chat, nil
+        }
+    }
+    return nil, nil
+}

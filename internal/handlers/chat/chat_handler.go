@@ -35,7 +35,7 @@ func (handler *ChatHandler) AddRoutes(server server.Server) {
 
 // CreateChat handles the creation of a new chat between two users.
 //	@Summary		Create a new chat
-//	@Description	Creates a new chat between two users in the system.
+//	@Description	Creates a new chat between two users in the system. If already exists, returns the existing chat.
 //	@Tags			chat
 //	@Accept			json
 //	@Produce		json
