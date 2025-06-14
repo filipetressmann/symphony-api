@@ -14,6 +14,7 @@ type PostgreConnection interface {
 	Put(data map[string]any, tableName string) error
 	PutReturningId(data map[string]any, tableName string, idName string) (any, error)
 	Get(constraints map[string]any, tableName string) ([]map[string]any, error)
+	GetChatWithLimit(chat_id int32, limit int32, tableName string) ([]map[string]any, error)
 }
 
 type PostgreConnectionImpl struct {
@@ -176,4 +177,20 @@ func getSelectWthConstraintsQuery(constraints map[string]any, tableName string) 
 
 func joinComma(values []string) string {
 	return strings.Join(values, ",")
+}
+
+func (conn *PostgreConnectionImpl) GetChatWithLimit(chat_id int32, limit int32, tableName string) ([]map[string]any, error) {
+	var time_column string
+	if tableName == "CHAT_MESSAGE" {
+		time_column = "sent_at"	
+	} else if tableName == "CHAT" {
+		time_column = "created_at"
+	}
+
+    sql := fmt.Sprintf("SELECT * FROM %s WHERE chat_id = $1 ORDER BY %s DESC LIMIT $2", tableName, time_column)
+    rows, err := conn.Query(context.Background(), sql, chat_id, limit)
+    if err != nil {
+        return nil, err
+    }
+    return rowsToMaps(rows)
 }
