@@ -8,6 +8,7 @@ import (
 
 const CHAT_TABLE_NAME = "CHAT"
 const USER_TO_CHAT_TABLE = "CHAT_PARTICIPANTS"
+const CHAT_MESSAGE_TABLE = "CHAT_MESSAGE"
 const JOINED_USERS_AND_CHAT_PARTICIPANTS = "USERS u JOIN CHAT_PARTICIPANTS cp ON u.id = cp.user_id"
 const JOINED_CHATS_AND_PARTICIPANTS = "CHAT c JOIN CHAT_PARTICIPANTS cp ON c.chat_id = cp.chat_id"
 
@@ -123,4 +124,44 @@ func (repository *ChatRepository) FindChatByUsers(userId1, userId2 int32) (*mode
         }
     }
     return nil, nil
+}
+
+func (repository *ChatRepository) AddMessageToChatAndReturn(chatId int32, authorId int32, message string) (*model.ChatMessage, error) {
+    data := map[string]any{
+        "chat_id":  chatId,
+        "author_id": authorId,
+        "message":   message,
+    }
+    id, err := repository.connection.PutReturningId(data, CHAT_MESSAGE_TABLE, "message_id")
+    if err != nil {
+        return nil, err
+    }
+
+    constraint := map[string]any{
+        "message_id": id,
+    }
+    msgs, err := repository.connection.Get(constraint, CHAT_MESSAGE_TABLE)
+    if err != nil || len(msgs) == 0 {
+        return nil, errors.New("could not retrieve inserted message")
+    }
+    return model.MapToChatMessage(msgs[0]), nil
+}
+
+func (repository *ChatRepository) ListMessagesFromChat(chatId int32, limit int32) ([]*model.ChatMessage, error) {
+    messagesData, err := repository.connection.GetChatWithLimit(
+        chatId,
+        limit,
+        CHAT_MESSAGE_TABLE,
+    )
+
+    if err != nil {
+        return nil, err
+    }
+
+    var messages []*model.ChatMessage
+    for _, messageData := range messagesData {
+        messages = append(messages, model.MapToChatMessage(messageData))
+    }
+
+    return messages, nil
 }
