@@ -180,12 +180,15 @@ func joinComma(values []string) string {
 }
 
 func (conn *PostgreConnectionImpl) GetChatWithLimit(chat_id int32, limit int32, tableName string) ([]map[string]any, error) {
-	var time_column string
-	if tableName == "CHAT_MESSAGE" {
-		time_column = "sent_at"	
-	} else if tableName == "CHAT" {
-		time_column = "created_at"
-	}
+    var time_column string
+    switch tableName {
+    case "CHAT_MESSAGE":
+        time_column = "sent_at"
+    case "CHAT":
+        time_column = "created_at"
+    default:
+        return nil, fmt.Errorf("unsupported table: %s", tableName)
+    }
 
     sql := fmt.Sprintf("SELECT * FROM %s WHERE chat_id = $1 ORDER BY %s DESC LIMIT $2", tableName, time_column)
     rows, err := conn.Query(context.Background(), sql, chat_id, limit)
