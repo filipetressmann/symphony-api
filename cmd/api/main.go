@@ -2,9 +2,10 @@ package main
 
 import (
 	"symphony-api/internal/handlers"
+	artist_handlers "symphony-api/internal/handlers/artist"
 	community_handlers "symphony-api/internal/handlers/community"
 	music_handlers "symphony-api/internal/handlers/music"
-	artist_handlers "symphony-api/internal/handlers/artist"
+	playlist_handlers "symphony-api/internal/handlers/playlist"
 	user_handlers "symphony-api/internal/handlers/users"
 	"symphony-api/internal/persistence/connectors/mongo"
 	"symphony-api/internal/persistence/connectors/postgres"
@@ -24,6 +25,7 @@ func main() {
 	// Repositórios
 	songRepo := mongo_repository.NewSongRepository(mongoConnection)
 	artistRepo := mongo_repository.NewArtistRepository(mongoConnection)
+	playlistRepo := mongo_repository.NewPlaylistRepository(mongoConnection)
 
 	// Handlers
 	userCrud := user_handlers.NewUserHandler(postgresConnection)
@@ -31,6 +33,7 @@ func main() {
 	communityCrud := community_handlers.NewCommunityHandler(postgresConnection)
 	songHandler := music_handlers.NewSongHandler(songRepo)
 	artistHandler := artist_handlers.NewArtistHandler(artistRepo)
+	playlistHandler := playlist_handlers.NewPlaylistHandler(playlistRepo)
 
 	// Servidor
 	srv := server.NewServer(config.GetEnv("API_PORT", "8080"))
@@ -42,6 +45,7 @@ func main() {
 	communityCrud.AddRoutes(*srv)
 	songHandler.AddRoutes(srv)
 	artistHandler.AddRoutes(srv)
+	playlistHandler.AddRoutes(srv)
 
 	// Swagger
 	srv.AddRoute("/swagger/*", httpSwagger.Handler(
