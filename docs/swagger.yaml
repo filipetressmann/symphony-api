@@ -1,4 +1,65 @@
 definitions:
+  artist.CreateArtistRequest:
+    properties:
+      biography:
+        type: string
+      country:
+        type: string
+      description:
+        type: string
+      genres:
+        items:
+          type: string
+        type: array
+      id_spotify:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+    type: object
+  model.Artist:
+    properties:
+      biography:
+        type: string
+      country:
+        type: string
+      description:
+        type: string
+      genres:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      idspotify:
+        type: string
+      imageURL:
+        type: string
+      name:
+        type: string
+    type: object
+  model.Song:
+    properties:
+      album:
+        type: string
+      artistID:
+        type: string
+      duration:
+        type: integer
+      genre:
+        type: string
+      id:
+        type: string
+      idspotify:
+        type: string
+      reseaseYear:
+        type: integer
+      title:
+        type: string
+      urlspotify:
+        type: string
+    type: object
   model.User:
     properties:
       birth_date:
@@ -14,6 +75,25 @@ definitions:
       userId:
         type: integer
       username:
+        type: string
+    type: object
+  music.CreateSongRequest:
+    properties:
+      album:
+        type: string
+      artist_id:
+        type: string
+      duration:
+        type: integer
+      genre:
+        type: string
+      id_spotify:
+        type: string
+      release_year:
+        type: integer
+      title:
+        type: string
+      url_spotify:
         type: string
     type: object
   request_model.AddUserToCommunityRequest:
@@ -191,10 +271,6 @@ definitions:
     type: object
 info:
   contact: {}
-  description: API for Symphony application, which is an social media created for
-    educational purposes, focusing on music.
-  title: Symphony API
-  version: "1.0"
 paths:
   /api/community/add_user:
     post:
@@ -541,4 +617,187 @@ paths:
       summary: Get all communities of a user
       tags:
       - User
+  /artists:
+    post:
+      consumes:
+      - application/json
+      description: Create a new artist in the database
+      parameters:
+      - description: Artist object
+        in: body
+        name: artist
+        required: true
+        schema:
+          $ref: '#/definitions/artist.CreateArtistRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Artist'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new artist
+      tags:
+      - artists
+  /artists/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get artist data by MongoDB ObjectID
+      parameters:
+      - description: Artist ObjectID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Artist'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get artist by ID
+      tags:
+      - artists
+  /artists/spotify/{spotify_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get artist data by Spotify ID
+      parameters:
+      - description: Spotify Artist ID
+        in: path
+        name: spotify_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Artist'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get artist by Spotify ID
+      tags:
+      - artists
+  /songs:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all songs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Song'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all songs
+      tags:
+      - songs
+    post:
+      consumes:
+      - application/json
+      description: Create a new song in the database
+      parameters:
+      - description: Song object
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/music.CreateSongRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Song'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new song
+      tags:
+      - songs
+  /songs/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a song by its MongoDB ObjectID
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Song'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a song by ID
+      tags:
+      - songs
 swagger: "2.0"
