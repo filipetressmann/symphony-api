@@ -8,8 +8,8 @@ import (
 )
 
 type Server struct {
-	port string
-	mux  *http.ServeMux
+	port   string
+	mux    *http.ServeMux
 	router *chi.Mux
 }
 
@@ -21,8 +21,8 @@ type Server struct {
 // It is designed to be used in a web application where you need to handle HTTP requests.
 func NewServer(port string) *Server {
 	return &Server{
-		port: port,
-		mux:  http.NewServeMux(),
+		port:   port,
+		mux:    http.NewServeMux(),
 		router: chi.NewRouter(),
 	}
 }
@@ -55,7 +55,7 @@ func (s *Server) AddGroup(pattern string, fn func(r chi.Router)) {
 // The port parameter specifies the port on which the server will listen for incoming requests.
 func (s *Server) Start() {
 	log.Printf("Starting server in port %s...", s.port)
-	if err := http.ListenAndServe(":"+s.port, s.mux); err != nil {
-		log.Fatalf("It wasn't possible to start the server in port %s\n", err)
+	if err := http.ListenAndServe(":"+s.port, s.router); err != nil {
+		log.Fatalf("It wasn't possible to start the server in port %s\n", s.port)
 	}
 }
