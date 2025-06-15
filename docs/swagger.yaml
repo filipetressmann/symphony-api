@@ -39,6 +39,42 @@ definitions:
       name:
         type: string
     type: object
+  model.Playlist:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      idspotify:
+        type: string
+      imageURL:
+        type: string
+      likes:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      public:
+        type: boolean
+      songs:
+        items:
+          properties:
+            order:
+              type: integer
+            songID:
+              type: string
+          type: object
+        type: array
+      title:
+        type: string
+      updatedAt:
+        type: string
+      userID:
+        type: string
+    type: object
   model.Song:
     properties:
       album:
@@ -94,6 +130,32 @@ definitions:
       title:
         type: string
       url_spotify:
+        type: string
+    type: object
+  playlist.CreatePlaylistRequest:
+    properties:
+      description:
+        type: string
+      id_spotify:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      public:
+        type: boolean
+      songs:
+        items:
+          properties:
+            order:
+              type: integer
+            song_id:
+              type: string
+          type: object
+        type: array
+      title:
+        type: string
+      user_id:
         type: string
     type: object
   request_model.AddUserToCommunityRequest:
@@ -711,6 +773,102 @@ paths:
       summary: Get artist by Spotify ID
       tags:
       - artists
+  /playlists:
+    post:
+      consumes:
+      - application/json
+      description: Create a new playlist in the database
+      parameters:
+      - description: Playlist object
+        in: body
+        name: playlist
+        required: true
+        schema:
+          $ref: '#/definitions/playlist.CreatePlaylistRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Playlist'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new playlist
+      tags:
+      - playlists
+  /playlists/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a playlist by its MongoDB ObjectID
+      parameters:
+      - description: Playlist ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Playlist'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get playlist by ID
+      tags:
+      - playlists
+  /playlists/user/{username}:
+    get:
+      consumes:
+      - application/json
+      description: Get all playlists created by a specific user
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Playlist'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get user's playlists
+      tags:
+      - playlists
   /songs:
     get:
       consumes:
