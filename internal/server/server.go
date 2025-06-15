@@ -3,11 +3,14 @@ package server
 import (
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type Server struct {
 	port string
 	mux  *http.ServeMux
+	router *chi.Mux
 }
 
 // NewServer creates a new instance of the Server struct.
@@ -20,6 +23,7 @@ func NewServer(port string) *Server {
 	return &Server{
 		port: port,
 		mux:  http.NewServeMux(),
+		router: chi.NewRouter(),
 	}
 }
 
@@ -32,6 +36,15 @@ func NewServer(port string) *Server {
 // enabling you to handle different HTTP methods and paths.
 func (s *Server) AddRoute(path string, handler http.HandlerFunc) {
 	s.mux.HandleFunc(path, handler)
+	s.router.HandleFunc(path, handler)
+}
+
+// AddGroup adds a new route group to the server.
+// It takes a pattern and a function that configures the group's routes.
+// The pattern parameter specifies the base path for the group,
+// and the fn parameter is a function that receives a chi.Router to configure the group's routes.
+func (s *Server) AddGroup(pattern string, fn func(r chi.Router)) {
+	s.router.Route(pattern, fn)
 }
 
 // Start starts the HTTP server on the specified port.
