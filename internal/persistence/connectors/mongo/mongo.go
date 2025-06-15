@@ -43,3 +43,8 @@ func NewMongoConnection() *MongoConnection {
 		client: client,
 	}
 }
+
+// GetCollection returns a MongoDB collection for the specified database and collection name.
+func (conn *MongoConnection) GetCollection(database, collection string) *mongo.Collection {
+	return conn.client.Database(database).Collection(collection)
+}
