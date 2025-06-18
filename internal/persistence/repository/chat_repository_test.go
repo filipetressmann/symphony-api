@@ -118,3 +118,106 @@ func TestAddUserToChat_Failure(t *testing.T) {
     assert.Error(t, err)
     mockConn.AssertExpectations(t)
 }
+
+func TestListUsersFromChat_Success(t *testing.T) {
+    mockConn := new(MockPostgreConnection)
+    repo := NewChatRepository(mockConn)
+
+    chat := &model.Chat{ChatId: 1}
+
+    dbResult := []map[string]any{
+        {
+            "user_id":   int32(2),
+            "username":  "user1",
+        },
+        {
+            "user_id":   int32(3),
+            "username":  "user2",
+        },
+    }
+
+    mockConn.On("Get", mock.Anything, JOINED_USERS_AND_CHAT_PARTICIPANTS).Return(dbResult, nil)
+
+    users, err := repo.ListUsersFromChat(chat)
+    assert.NoError(t, err)
+    assert.Len(t, users, 2)
+    assert.Equal(t, "user1", users[0].Username)
+    assert.Equal(t, "user2", users[1].Username)
+    mockConn.AssertExpectations(t)
+}
+
+func TestAddMessageToChatAndReturn_GetFailure(t *testing.T) {
+    mockConn := new(MockPostgreConnection)
+    repo := NewChatRepository(mockConn)
+
+    chatId := int32(3)
+    authorId := int32(2)
+    message := "Hello"
+    fakeMsgId := int32(99)
+
+    data := map[string]any{
+        "chat_id":  chatId,
+        "author_id": authorId,
+        "message":   message,
+    }
+    constraint := map[string]any{
+        "message_id": fakeMsgId,
+    }
+
+    mockConn.On("PutReturningId", data, CHAT_MESSAGE_TABLE, "message_id").Return(fakeMsgId, nil)
+    mockConn.On("Get", constraint, CHAT_MESSAGE_TABLE).Return([]map[string]any{}, nil)
+
+    msg, err := repo.AddMessageToChatAndReturn(chatId, authorId, message)
+    assert.Error(t, err)
+    assert.Nil(t, msg)
+    mockConn.AssertExpectations(t)
+}
+
+func TestListMessagesFromChat_Success(t *testing.T) {
+    mockConn := new(MockPostgreConnection)
+    repo := NewChatRepository(mockConn)
+
+    chatId := int32(3)
+    limit := int32(2)
+    now := time.Now()
+
+    dbResult := []map[string]any{
+        {
+            "message_id": int32(1),
+            "author_id":  int32(2),
+            "chat_id":    chatId,
+            "message":    "Hello",
+            "sent_at":    now,
+        },
+        {
+            "message_id": int32(2),
+            "author_id":  int32(2),
+            "chat_id":    chatId,
+            "message":    "World",
+            "sent_at":    now.Add(-time.Minute),
+        },
+    }
+
+    mockConn.On("GetChatWithLimit", chatId, limit, CHAT_MESSAGE_TABLE).Return(dbResult, nil)
+
+    messages, err := repo.ListMessagesFromChat(chatId, limit)
+    assert.NoError(t, err)
+    assert.Len(t, messages, 2)
+    assert.Equal(t, "Hello", messages[0].Message)
+    assert.Equal(t, "World", messages[1].Message)
+    mockConn.AssertExpectations(t)
+}
+
+func TestListMessagesFromChat_Failure(t *testing.T) {
+    mockConn := new(MockPostgreConnection)
+    repo := NewChatRepository(mockConn)
+
+    chatId := int32(3)
+    limit := int32(2)
+
+    mockConn.On("GetChatWithLimit", chatId, limit, CHAT_MESSAGE_TABLE).Return([]map[string]any{}, errors.New("db error"))
+    messages, err := repo.ListMessagesFromChat(chatId, limit)
+    assert.Error(t, err)
+    assert.Nil(t, messages)
+    mockConn.AssertExpectations(t)
+}

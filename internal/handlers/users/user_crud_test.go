@@ -34,6 +34,11 @@ func (m *MockPostgreConnection) Get(constraints map[string]any, table string) ([
     return args.Get(0).([]map[string]any), args.Error(1)
 }
 
+func (m *MockPostgreConnection) GetChatWithLimit(chat_id int32, limit int32, tableName string) ([]map[string]any, error) {
+	args := m.Called(chat_id, limit, tableName)
+	return args.Get(0).([]map[string]any), args.Error(1)
+}
+
 func TestCreateUserHandler(t *testing.T) {
 	mockConn := &MockPostgreConnection{}
 	userCrud := NewUserHandler(mockConn)

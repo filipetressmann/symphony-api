@@ -31,6 +31,8 @@ func (handler *ChatHandler) AddRoutes(server server.Server) {
     server.AddRoute("/api/chat/get_by_id", base_handlers.CreateGetMethodHandler(handler.GetChatById))
     server.AddRoute("/api/chat/list_users", base_handlers.CreateGetMethodHandler(handler.ListUsersFromChat))
     server.AddRoute("/api/chat/list_chats", base_handlers.CreateGetMethodHandler(handler.ListChatsFromUser))
+    server.AddRoute("/api/chat/list_messages", base_handlers.CreateGetMethodHandler(handler.ListChatMessages))
+    server.AddRoute("/api/chat/add_message", base_handlers.CreatePostMethodHandler(handler.AddMessageToChat))
 }
 
 // CreateChat handles the creation of a new chat between two users.
@@ -129,4 +131,58 @@ func (handler *ChatHandler) ListChatsFromUser(request request_model.ListChatsFro
     return &request_model.ListChatsFromUserResponse{
         ChatIds: chatIds,
     }, nil
+}
+
+// AddMessageToChat adds a message to a chat and returns the message details.
+//	@Summary		Add message to chat
+//	@Description	Adds a message to a chat and returns the message details.
+//	@Tags			chat
+//	@Accept			json
+//	@Produce		json
+//	@Param			body		body		request_model.AddMessageToChatRequest	true	"Message details to add to the chat"
+//	@Success		200		{object}	request_model.AddMessageToChatResponse
+//	@Failure		400		{object}	map[string]string	"Invalid Input"
+//	@Failure		404		{object}	map[string]string	"Chat Not Found"
+//	@Failure		500		{object}	map[string]string	"Internal Server Error"
+//  @Router			/api/chat/add_message [post]
+func (handler *ChatHandler) AddMessageToChat(request request_model.AddMessageToChatRequest) (*request_model.AddMessageToChatResponse, error) {
+    message, err := handler.chatService.AddMessageToChatAndReturn(request.ChatId, request.AuthorId, request.Message)
+    if err != nil {
+        log.Printf("Error adding message to chat: %s", err)
+        return nil, errors.New("could not add message to chat")
+    }
+
+    return request_model.NewAddMessageToChatResponse(
+        message.MessageId,
+        message.AuthorId,
+        message.ChatId,
+        message.SentAt,
+    ), nil
+}
+
+// ListChatMessages retrieves messages from a chat with a specified limit.
+//	@Summary		List messages from chat
+//	@Description	Retrieves messages from a chat with a specified limit.
+//	@Tags			chat
+//	@Accept			json
+//	@Produce		json
+//	@Param			chat_id	query		int32	true	"ID of the chat to list messages from"
+//	@Param			limit	query		int32	false	"Number of messages to retrieve (default is 10)"
+//	@Success		200		{object}	request_model.ListMessagesFromChatResponse
+//	@Failure		400		{object}	map[string]string	"Invalid Input"
+//	@Failure		404		{object}	map[string]string	"Chat Not Found"
+//	@Failure		500		{object}	map[string]string	"Internal Server Error"
+//  @Router			/api/chat/list_messages [get]
+func (handler *ChatHandler) ListChatMessages(request request_model.ListMessagesFromChatRequest) (*request_model.ListMessagesFromChatResponse, error) {
+    limit := request.Limit
+    if limit <= 0 {
+        limit = 10
+    }
+    messages, err := handler.chatService.ListChatMessages(request.ChatId, limit)    
+    if err != nil {
+        log.Printf("Error listing messages from chat: %s", err)
+        return nil, errors.New("could not list messages from chat")
+    }
+
+    return request_model.MapsToMessagesFromChat(messages), nil
 }
