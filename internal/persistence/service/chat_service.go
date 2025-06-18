@@ -104,3 +104,33 @@ func (service *ChatService) ListChatsByUser(username string) ([]*model.Chat, err
 
 	return chats, nil
 }
+
+func (service *ChatService) AddMessageToChatAndReturn(chatId int32, authorId int32, message string) (*model.ChatMessage, error) {
+    chat, err := service.chatRepository.GetByChatId(chatId)
+    if err != nil || chat == nil {
+        return nil, errors.New("chat does not exist")
+    }
+    return service.chatRepository.AddMessageToChatAndReturn(chatId, authorId, message)
+}
+
+func (service *ChatService) ListChatMessages(chatId int32, limit int32) ([]*model.ChatMessage, error) {
+	chat, err := service.chatRepository.GetByChatId(chatId)
+	if err != nil {
+		return nil, errors.New("chat does not exist")
+	}
+
+	if chat == nil {
+		return nil, errors.New("chat not found")
+	}
+
+	if limit <= 0 {
+		return nil, errors.New("limit must be greater than zero")
+	}
+
+	messages, err := service.chatRepository.ListMessagesFromChat(chatId, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	return messages, nil
+}

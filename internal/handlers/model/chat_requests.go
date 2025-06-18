@@ -2,6 +2,7 @@ package request_model
 
 import (
 	"time"
+	"symphony-api/internal/persistence/model"
 )
 
 type BaseChatData struct {
@@ -42,5 +43,55 @@ func NewBaseChatData(chatId int32, createdAt time.Time) *BaseChatData {
 	}
 }
 
+type AddMessageToChatRequest struct {
+	ChatId  int32  `json:"chat_id" binding:"required"`
+	AuthorId int32  `json:"author_id" binding:"required"`
+	Message string `json:"message" binding:"required"`
+}
 
+type AddMessageToChatResponse struct {
+	MessageId int32     `json:"message_id" binding:"required"`
+	AuthorId  int32     `json:"author_id" binding:"required"`
+	ChatId    int32     `json:"chat_id" binding:"required"`
+	SentAt    time.Time `json:"sent_at" binding:"required"`
+}
 
+func NewAddMessageToChatResponse(messageId, authorId, chatId int32, sentAt time.Time) *AddMessageToChatResponse {
+	return &AddMessageToChatResponse{
+		MessageId: messageId,
+		AuthorId:  authorId,
+		ChatId:    chatId,
+		SentAt:    sentAt,
+	}
+}
+	
+type ListMessagesFromChatRequest struct {
+	ChatId int32 `schema:"chat_id,required"`
+	Limit int32 `schema:"limit,default=10"`
+}
+
+type MessagesFromChat struct {
+	AuthorId int32     `json:"author_id" binding:"required"`
+	SentAt	time.Time `json:"sent_at" binding:"required"`
+	Message string    `json:"message" binding:"required"`
+}
+
+type ListMessagesFromChatResponse struct {
+	ChatId  int32              `json:"chat_id" binding:"required"`
+	Messages []MessagesFromChat `json:"messages" binding:"required"`
+}
+
+func MapsToMessagesFromChat(message []*model.ChatMessage) *ListMessagesFromChatResponse {
+	messages := make([]MessagesFromChat, len(message))
+	for i, msg := range message {
+		messages[i] = MessagesFromChat{
+			AuthorId: msg.AuthorId,
+			SentAt:   msg.SentAt,
+			Message:  msg.Message,
+		}
+	}
+	return &ListMessagesFromChatResponse{
+		ChatId:   message[0].ChatId,
+		Messages: messages,
+	}
+}
