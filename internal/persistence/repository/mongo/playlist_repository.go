@@ -5,9 +5,10 @@ import (
 	local_mongo "symphony-api/internal/persistence/connectors/mongo"
 
 	"symphony-api/internal/persistence/model"
-	"go.mongodb.org/mongo-driver/mongo"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type PlaylistRepository struct {
@@ -52,4 +53,10 @@ func (r *PlaylistRepository) GetPlaylistsByUserID(ctx context.Context, userID st
 		return nil, err
 	}
 	return playlists, nil
+}
+
+// UpdatePlaylist updates an existing playlist in the database
+func (r *PlaylistRepository) UpdatePlaylist(ctx context.Context, id primitive.ObjectID, playlist model.Playlist) error {
+	_, err := r.collection.ReplaceOne(ctx, bson.M{"_id": id}, playlist)
+	return err
 }
