@@ -46,7 +46,10 @@ func (h *SongHandler) GetAllSongs(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to fetch songs", http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(songs)
+	if err := json.NewEncoder(w).Encode(songs); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 // GetSongByID returns a song by its ID
@@ -74,7 +77,10 @@ func (h *SongHandler) GetSongByID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Song not found", http.StatusNotFound)
 		return
 	}
-	json.NewEncoder(w).Encode(song)
+	if err := json.NewEncoder(w).Encode(song); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 // CreateSongRequest represents the request body for creating a new song
@@ -139,5 +145,8 @@ func (h *SongHandler) CreateSong(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(song)
+	if err := json.NewEncoder(w).Encode(song); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
