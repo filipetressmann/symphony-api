@@ -38,7 +38,11 @@ func (r *PlaylistRepository) GetPlaylistsByUserID(ctx context.Context, userID st
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(ctx)
+	defer func() {
+		if closeErr := cursor.Close(ctx); closeErr != nil {
+			err = closeErr
+		}
+	}()
 
 	var playlists []model.Playlist
 	for cursor.Next(ctx) {
