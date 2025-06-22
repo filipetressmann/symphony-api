@@ -37,7 +37,11 @@ func (r *SongRepository) GetAllSongs(ctx context.Context) ([]model.Song, error) 
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(ctx)
+	defer func() {
+		if closeErr := cursor.Close(ctx); closeErr != nil {
+			err = closeErr
+		}
+	}()
 
 	var songs []model.Song
 	for cursor.Next(ctx) {
