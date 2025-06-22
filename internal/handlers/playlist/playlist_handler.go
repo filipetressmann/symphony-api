@@ -58,7 +58,10 @@ func (h *PlaylistHandler) GetPlaylistByID(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	json.NewEncoder(w).Encode(playlist)
+	if err := json.NewEncoder(w).Encode(playlist); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 // GetPlaylistsByUsername returns all playlists created by a user
@@ -75,13 +78,16 @@ func (h *PlaylistHandler) GetPlaylistsByUsername(w http.ResponseWriter, r *http.
 	ctx := context.Background()
 	username := chi.URLParam(r, "username")
 
-	playlists, err := h.repo.GetPlaylistsByUserID(ctx, username)
+	playlist, err := h.repo.GetPlaylistsByUserID(ctx, username)
 	if err != nil {
 		http.Error(w, "Playlists not found", http.StatusNotFound)
 		return
 	}
 
-	json.NewEncoder(w).Encode(playlists)
+	if err := json.NewEncoder(w).Encode(playlist); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 // CreatePlaylistRequest represents the request body for creating a new playlist
@@ -162,7 +168,10 @@ func (h *PlaylistHandler) CreatePlaylist(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(playlist)
+	if err := json.NewEncoder(w).Encode(playlist); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 // AddSongToPlaylistRequest represents the request body for adding a song to a playlist
@@ -249,5 +258,8 @@ func (h *PlaylistHandler) AddSongToPlaylist(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	json.NewEncoder(w).Encode(playlist)
+	if err := json.NewEncoder(w).Encode(playlist); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
