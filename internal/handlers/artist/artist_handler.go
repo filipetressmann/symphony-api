@@ -55,7 +55,10 @@ func (h *ArtistHandler) GetArtistByID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Artist not found", http.StatusNotFound)
 		return
 	}
-	json.NewEncoder(w).Encode(artist)
+	if err := json.NewEncoder(w).Encode(artist); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 // GetArtistBySpotifyID returns an artist by their Spotify ID
@@ -77,7 +80,10 @@ func (h *ArtistHandler) GetArtistBySpotifyID(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Artist not found", http.StatusNotFound)
 		return
 	}
-	json.NewEncoder(w).Encode(artist)
+	if err := json.NewEncoder(w).Encode(artist); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 // CreateArtistRequest represents the request body for creating a new artist
@@ -129,5 +135,8 @@ func (h *ArtistHandler) CreateArtist(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(artist)
+	if err := json.NewEncoder(w).Encode(artist); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
