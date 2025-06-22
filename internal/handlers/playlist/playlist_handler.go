@@ -28,6 +28,7 @@ func (h *PlaylistHandler) AddRoutes(server interface {
 		r.Get("/{id}", h.GetPlaylistByID)
 		r.Get("/user/{username}", h.GetPlaylistsByUsername)
 		r.Post("/", h.CreatePlaylist)
+		r.Post("/{id}/songs", h.AddSongToPlaylist)
 	})
 }
 
@@ -161,5 +162,92 @@ func (h *PlaylistHandler) CreatePlaylist(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(playlist)
+}
+
+// AddSongToPlaylistRequest represents the request body for adding a song to a playlist
+type AddSongToPlaylistRequest struct {
+	SongID string `json:"song_id" binding:"required"`
+	Order  int32  `json:"order,omitempty"`
+}
+
+// AddSongToPlaylist adds a song to an existing playlist
+// @Summary Add song to playlist
+// @Description Add a song to an existing playlist
+// @Tags playlists
+// @Accept json
+// @Produce json
+// @Param id path string true "Playlist ID"
+// @Param song body AddSongToPlaylistRequest true "Song to add"
+// @Success 200 {object} model.Playlist
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /playlists/{id}/songs [post]
+func (h *PlaylistHandler) AddSongToPlaylist(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
+	// Get playlist ID from URL
+	playlistIDStr := chi.URLParam(r, "id")
+	playlistID, err := primitive.ObjectIDFromHex(playlistIDStr)
+	if err != nil {
+		http.Error(w, "Invalid playlist ID", http.StatusBadRequest)
+		return
+	}
+
+	// Parse request body
+	var req AddSongToPlaylistRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	// Validate song ID
+	songID, err := primitive.ObjectIDFromHex(req.SongID)
+	if err != nil {
+		http.Error(w, "Invalid song ID", http.StatusBadRequest)
+		return
+	}
+
+	// Get current playlist
+	playlist, err := h.repo.GetPlaylistByID(ctx, playlistID)
+	if err != nil {
+		http.Error(w, "Playlist not found", http.StatusNotFound)
+		return
+	}
+
+	// Check if song is already in playlist
+	for _, song := range playlist.Songs {
+		if song.SongID == songID {
+			http.Error(w, "Song already exists in playlist", http.StatusBadRequest)
+			return
+		}
+	}
+
+	// Determine order (if not provided, add to end)
+	order := req.Order
+	if order == 0 {
+		order = int32(len(playlist.Songs) + 1)
+	}
+
+	// Add song to playlist
+	newSong := struct {
+		SongID primitive.ObjectID `bson:"song_id,omitempty"`
+		Order  int32              `bson:"order,omitempty"`
+	}{
+		SongID: songID,
+		Order:  order,
+	}
+
+	playlist.Songs = append(playlist.Songs, newSong)
+	playlist.UpdatedAt = time.Now()
+
+	// Update playlist in database
+	err = h.repo.UpdatePlaylist(ctx, playlistID, *playlist)
+	if err != nil {
+		http.Error(w, "Failed to update playlist", http.StatusInternalServerError)
+		return
+	}
+
 	json.NewEncoder(w).Encode(playlist)
 }
