@@ -14,7 +14,7 @@ type GetUserFriendsRequest struct {
 }
 
 type GetUserFriendsResponse struct {
-	Friends []*UserResponse `json:"friends" binding:"required`
+	Friends []*UserResponse `json:"friends" binding:"required"`
 }
 
 type ListUserCommunitiesRequest struct {

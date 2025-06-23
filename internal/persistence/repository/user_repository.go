@@ -26,10 +26,15 @@ func NewUserRepository(connection postgres.PostgreConnection, neo4jConnection ne
 }
 
 func (repository *UserRepository) Put(user *model.User) error {
-	repository.neo4jConn.Execute(
+	err := repository.neo4jConn.Execute(
 		"CREATE (p:User {username:$username})",
 		user.ToMap(),
 	)
+
+	if err != nil {
+		return err
+	}
+
 	return repository.connection.Put(user.ToMap(), USER_TABLE_NAME)
 }
 
