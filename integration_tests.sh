@@ -81,3 +81,12 @@ post_and_assert "http://localhost:8080/api/chat/list_chats?username=$username" "
 post_and_assert "http://localhost:8080/api/chat/list_users?chat_id=1" "{}" "List users of chat"
 
 echo "🎉 All tests passed successfully!"
+
+post_and_assert "http://localhost:8080/api/user/create_friendship" "{
+ \"username1\": \"$username\",
+ \"username2\": \"$username2\"
+}" "Create friendship"
+
+post_and_assert "http://localhost:8080/api/user/get_by_username?username=$username2" "{}" "Get user by username"
+
+post_and_assert "http://localhost:8080/api/user/list_friends?username=$username" "{}" "List friends of user"
