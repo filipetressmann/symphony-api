@@ -5,6 +5,7 @@ import (
 	"log"
 	base_handlers "symphony-api/internal/handlers/base"
 	request_model "symphony-api/internal/handlers/model"
+	"symphony-api/internal/persistence/connectors/neo4j"
 	"symphony-api/internal/persistence/connectors/postgres"
 	"symphony-api/internal/persistence/repository"
 	"symphony-api/internal/persistence/service"
@@ -16,9 +17,9 @@ type ChatHandler struct {
     chatService      *service.ChatService
 }
 
-func NewChatHandler(connection postgres.PostgreConnection) *ChatHandler {
+func NewChatHandler(connection postgres.PostgreConnection, neo4jConnection neo4j.Neo4jConnection) *ChatHandler {
     chatRepository := repository.NewChatRepository(connection)
-    chatService := service.NewChatService(chatRepository, repository.NewUserRepository(connection))
+    chatService := service.NewChatService(chatRepository, repository.NewUserRepository(connection, neo4jConnection))
 
     return &ChatHandler{
         chatRepository: chatRepository,

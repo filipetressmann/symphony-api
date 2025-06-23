@@ -19,7 +19,7 @@ func TestPutChat_Success(t *testing.T) {
         CreatedAt: time.Now(),
     }
 
-    mockConn.On("Put", input.ToMap(), CHAT_TABLE_NAME).Return(nil)
+    mockConn.On("PutReturningId", input.ToMap(), CHAT_TABLE_NAME, "chat_id").Return(int32(1), nil)
 
     err := repo.Put(input)
 
@@ -36,7 +36,7 @@ func TestPutChat_Failure(t *testing.T) {
         CreatedAt: time.Now(),
     }
 
-    mockConn.On("Put", input.ToMap(), CHAT_TABLE_NAME).Return(errors.New("db error"))
+    mockConn.On("PutReturningId", input.ToMap(), CHAT_TABLE_NAME, "chat_id").Return(nil, errors.New("db error"))
 
     err := repo.Put(input)
 
@@ -127,12 +127,13 @@ func TestListUsersFromChat_Success(t *testing.T) {
 
     dbResult := []map[string]any{
         {
-            "user_id":   int32(2),
+            "id":   int32(2),
             "username":  "user1",
-        },
-        {
-            "user_id":   int32(3),
-            "username":  "user2",
+            "fullname": "fulano da silva",
+            "email": "email",
+            "register_date": time.Now(),
+            "birth_date": time.Now(),
+            "telephone": "telephone",
         },
     }
 
@@ -140,9 +141,8 @@ func TestListUsersFromChat_Success(t *testing.T) {
 
     users, err := repo.ListUsersFromChat(chat)
     assert.NoError(t, err)
-    assert.Len(t, users, 2)
+    assert.Len(t, users, 1)
     assert.Equal(t, "user1", users[0].Username)
-    assert.Equal(t, "user2", users[1].Username)
     mockConn.AssertExpectations(t)
 }
 

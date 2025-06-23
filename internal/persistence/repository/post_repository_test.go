@@ -20,7 +20,7 @@ func TestPostRepository_Put(t *testing.T) {
 		LikeCount: 0,
 	}
 
-	mockConn.On("PutReturningId", mock.Anything, POST_TABLE).Return(int32(1), nil)
+	mockConn.On("PutReturningId", mock.Anything, POST_TABLE, "id").Return(int32(1), nil)
 
 	result, _ := repo.Put(post)
 

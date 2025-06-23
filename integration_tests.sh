@@ -6,6 +6,7 @@ timestamp=$(date +%s)
 community_name="test_community_$timestamp"
 username="test_user_$timestamp"
 username2="test_user_2_$timestamp"
+username3="test_user_3_$timestamp"
 
 function post_and_assert() {
     local url=$1
@@ -71,6 +72,14 @@ post_and_assert "http://localhost:8080/api/user/create" "{
     \"birth_date\": \"2002-01-01T00:00:00Z\"
 }" "Create user"
 
+post_and_assert "http://localhost:8080/api/user/create" "{
+    \"username\": \"$username3\",
+    \"fullname\": \"user da silva\",
+    \"email\": \"${username3}@example.com\",
+    \"telephone\": \"123456789\",
+    \"birth_date\": \"2002-01-01T00:00:00Z\"
+}" "Create user"
+
 post_and_assert "http://localhost:8080/api/chat/create" "{
  \"username1\": \"$username\",
  \"username2\": \"$username2\"
@@ -81,3 +90,26 @@ post_and_assert "http://localhost:8080/api/chat/list_chats?username=$username" "
 post_and_assert "http://localhost:8080/api/chat/list_users?chat_id=1" "{}" "List users of chat"
 
 echo "🎉 All tests passed successfully!"
+
+post_and_assert "http://localhost:8080/api/user/create_friendship" "{
+ \"username1\": \"$username\",
+ \"username2\": \"$username2\"
+}" "Create friendship"
+
+post_and_assert "http://localhost:8080/api/user/get_by_username?username=$username2" "{}" "Get user by username"
+
+post_and_assert "http://localhost:8080/api/user/list_friends?username=$username" "{}" "List friends of user"
+
+post_and_assert "http://localhost:8080/api/user/like_genre" "{
+ \"username\": \"$username\",
+ \"genre_name\": \"metal\"
+}" "Like genre"
+
+post_and_assert "http://localhost:8080/api/user/like_genre" "{
+ \"username\": \"$username3\",
+ \"genre_name\": \"metal\"
+}" "Like genre"
+
+post_and_assert "http://localhost:8080/api/user/list_liked_genres?username=$username" "{}" "List liked genres"
+
+post_and_assert "http://localhost:8080/api/user/get_friends_recommendations_on_genre?username=$username" "{}" "Get recommendations"

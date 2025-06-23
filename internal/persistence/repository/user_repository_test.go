@@ -12,7 +12,8 @@ import (
 
 func TestUserRepository_Put(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
-	repo := NewUserRepository(mockConn)
+	mockNeo4j := &MockNeo4jConn{}
+	repo := NewUserRepository(mockConn, mockNeo4j)
 
 	user := &model.User{
 		Username:     "john",
@@ -51,7 +52,8 @@ func getFetchTestData() (*model.User, map[string]any) {
 
 func TestUserRepository_GetById(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
-	repo := NewUserRepository(mockConn)
+	mockNeo4j := &MockNeo4jConn{}
+	repo := NewUserRepository(mockConn, mockNeo4j)
 
 	user, userMap := getFetchTestData()
 
@@ -65,7 +67,8 @@ func TestUserRepository_GetById(t *testing.T) {
 
 func TestUserRepository_GetByUsername(t *testing.T) {
 	mockConn := new(MockPostgreConnection)
-	repo := NewUserRepository(mockConn)
+	mockNeo4j := &MockNeo4jConn{}
+	repo := NewUserRepository(mockConn, mockNeo4j)
 
 	user, userMap := getFetchTestData()
 

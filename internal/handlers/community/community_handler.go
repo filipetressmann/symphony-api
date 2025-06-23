@@ -5,6 +5,7 @@ import (
 	"log"
 	base_handlers "symphony-api/internal/handlers/base"
 	request_model "symphony-api/internal/handlers/model"
+	"symphony-api/internal/persistence/connectors/neo4j"
 	"symphony-api/internal/persistence/connectors/postgres"
 	"symphony-api/internal/persistence/repository"
 	"symphony-api/internal/persistence/service"
@@ -16,13 +17,13 @@ type CommunityHandler struct {
 	communityService *service.CommunityService
 }
 
-func NewCommunityHandler(connection postgres.PostgreConnection) *CommunityHandler {
+func NewCommunityHandler(connection postgres.PostgreConnection, neo4jConnection neo4j.Neo4jConnection) *CommunityHandler {
 	communityRepository := repository.NewCommunityRepository(connection)
 	return &CommunityHandler{
 		communityRepository: communityRepository,
 		communityService: service.NewCommunityService(
 			communityRepository,
-			repository.NewUserRepository(connection),
+			repository.NewUserRepository(connection, neo4jConnection),
 		),
 	}
 }

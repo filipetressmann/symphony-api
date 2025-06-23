@@ -6,7 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/gorilla/schema v1.4.1
 	github.com/jackc/pgx/v5 v5.7.4
-	github.com/neo4j/neo4j-go-driver/v4 v4.4.8
+	github.com/neo4j/neo4j-go-driver/v5 v5.28.1
 	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.4

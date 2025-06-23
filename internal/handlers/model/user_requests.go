@@ -9,6 +9,35 @@ type GetUserByUsernameRequest struct {
 	Username string `schema:"username,required"`
 }
 
+type GetUserFriendsRequest struct {
+	Username string `schema:"username,required"`
+}
+
+type GetUserFriendsResponse struct {
+	Friends []*UserResponse `json:"friends" binding:"required"`
+}
+
+type GetFriendRecommendationByGenreRequest struct {
+	Username string `schema:"username,required"`
+}
+
+type GetFriendRecommendationByGenreResponse struct {
+	Friends []*UserResponse `json:"friends" binding:"required"`
+}
+
+type GetLikedGenresRequest struct {
+	Username string `schema:"username,required"`
+}
+
+type GetLikedGenresResponse struct {
+	Genres []string `json:"genres" binding:"required"`
+}
+
+type LikeGenreRequest struct {
+	Username string `json:"username" binding:"required"`
+	GenreName string `json:"genre_name" binding:"required"`
+}
+
 type ListUserCommunitiesRequest struct {
 	Username string `schema:"username,required"`
 }
@@ -27,6 +56,11 @@ type BaseUserModel struct {
 
 type CreateUserRequest struct {
 	*BaseUserModel
+}
+
+type CreateFriendshipRequest struct {
+	Username1 string `json:"username1" binding:"required"`
+	Username2 string `json:"username2" binding:"required"`
 }
 
 func NewBaseUserModel(user *model.User) *BaseUserModel {
