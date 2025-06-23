@@ -2,10 +2,11 @@ package main
 
 import (
 	"symphony-api/internal/handlers"
+	chat_handlers "symphony-api/internal/handlers/chat"
 	community_handlers "symphony-api/internal/handlers/community"
 	user_handlers "symphony-api/internal/handlers/users"
-	chat_handlers "symphony-api/internal/handlers/chat"
 	"symphony-api/internal/persistence/connectors/mongo"
+	"symphony-api/internal/persistence/connectors/neo4j"
 
 	//"symphony-api/internal/persistence/connectors/neo4j"
 	"symphony-api/internal/persistence/connectors/postgres"
@@ -23,12 +24,12 @@ import (
 func main() {
 	postgresConnection := postgres.NewPostgreConnection()
 	_ = mongo.NewMongoConnection()
-	//_ = neo4j.NewNeo4jConnection()
-
-	userCrud := user_handlers.NewUserHandler(postgresConnection)
+	neo4jConnection := neo4j.NewNeo4jConnection()
+	
+	userCrud := user_handlers.NewUserHandler(postgresConnection, neo4jConnection)
 	postCrud := handlers.NewPostCrud(postgresConnection)
-	communityCrud := community_handlers.NewCommunityHandler(postgresConnection)
-	chatCrud := chat_handlers.NewChatHandler(postgresConnection)
+	communityCrud := community_handlers.NewCommunityHandler(postgresConnection, neo4jConnection)
+	chatCrud := chat_handlers.NewChatHandler(postgresConnection, neo4jConnection)
 
 	// Create a new server instance
 	srv := server.NewServer(config.GetEnv("API_PORT", "8080"))
