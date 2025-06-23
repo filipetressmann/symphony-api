@@ -66,9 +66,28 @@ func (repository *UserRepository) ListFriendshipsByUsername(username string) ([]
 		return nil, err
 	}
 
-	friends := make([]*model.User, 1)
+	return repository.getAllUsers(getStringsFromRecord(result, "friend"))
+}
 
-	for _, username := range getFriendUsernames(result) {
+func (repository *UserRepository) LikeGenre(username string, genreName string) (error) {
+	return repository.neo4jConn.Execute(
+		`
+		MERGE (g:Genre {genre_name: $genreName})
+		WITH g
+		MATCH (u:User {username: $username})
+		MERGE (u)-[:LIKES]->(g)
+		`,
+		map[string]any{
+			"genreName": genreName,
+			"username": username,
+		},
+	)
+}
+
+func (repository *UserRepository) getAllUsers(usernames []string) ([]*model.User, error) {
+	friends := make([]*model.User, 0)
+
+	for _, username := range usernames {
 		friend, err := repository.GetByUsername(username)
 		if err != nil {
 			return nil, err
@@ -80,18 +99,57 @@ func (repository *UserRepository) ListFriendshipsByUsername(username string) ([]
 	return friends, nil
 }
 
-func getFriendUsernames(records []*neo4jDriver.Record) []string {
-	names := make([]string, 0)
+func (repository *UserRepository) ListLikedGenres(username string) ([]string, error) {
+	result, err := repository.neo4jConn.ExecuteReturning(
+		`
+		MATCH (u:User {username:$username})-[:LIKES]-(g:Genre)
+		RETURN g.genre_name AS genre
+		`,
+		map[string]any{
+			"username": username,
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return getStringsFromRecord(result, "genre"), nil
+}
+
+func (repository *UserRepository) GetRecommendationsOnGenre(username string) ([]*model.User, error) {
+	result, err := repository.neo4jConn.ExecuteReturning(
+		`
+		MATCH (u:User {username: $username})-[:LIKES]->(g:Genre)<-[:LIKES]-(other:User)
+		WHERE other.username <> $username
+  			AND NOT (u)-[:FRIENDS_WITH]-(other)
+		RETURN DISTINCT other.username AS username
+		LIMIT 10
+		`,
+		map[string]any{
+			"username": username,
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return repository.getAllUsers(getStringsFromRecord(result, "username"))
+}
+
+func getStringsFromRecord(records []*neo4jDriver.Record, property string) []string {
+	properties := make([]string, 0)
 
 	for _, record := range records {
-		friendName, ok := record.Get("friend")
+		value, ok := record.Get(property)
 
 		if ok {
-			names = append(names, friendName.(string))
+			properties = append(properties, value.(string))
 		}
 	}
 
-	return names
+	return properties
 }
 
 func (repository *UserRepository) get(constraint map[string]any) ([]*model.User, error) {

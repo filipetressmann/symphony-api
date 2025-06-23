@@ -17,6 +17,27 @@ type GetUserFriendsResponse struct {
 	Friends []*UserResponse `json:"friends" binding:"required"`
 }
 
+type GetFriendRecommendationByGenreRequest struct {
+	Username string `schema:"username,required"`
+}
+
+type GetFriendRecommendationByGenreResponse struct {
+	Friends []*UserResponse `json:"friends" binding:"required"`
+}
+
+type GetLikedGenresRequest struct {
+	Username string `schema:"username,required"`
+}
+
+type GetLikedGenresResponse struct {
+	Genres []string `json:"genres" binding:"required"`
+}
+
+type LikeGenreRequest struct {
+	Username string `json:"username" binding:"required"`
+	GenreName string `json:"genre_name" binding:"required"`
+}
+
 type ListUserCommunitiesRequest struct {
 	Username string `schema:"username,required"`
 }

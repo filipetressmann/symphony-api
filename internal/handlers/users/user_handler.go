@@ -2,7 +2,6 @@ package user_handlers
 
 import (
 	"errors"
-	"fmt"
 	base_handlers "symphony-api/internal/handlers/base"
 	request_model "symphony-api/internal/handlers/model"
 	"symphony-api/internal/persistence/connectors/neo4j"
@@ -50,6 +49,21 @@ func (handler *UserHandler) AddRoutes(server server.Server) {
 	server.AddRoute(
 		"/api/user/list_friends", 
 		base_handlers.CreateGetMethodHandler(handler.GetUserFriends),
+	)
+
+	server.AddRoute(
+		"/api/user/like_genre", 
+		base_handlers.CreatePostMethodHandler(handler.LikeGenre),
+	)
+
+	server.AddRoute(
+		"/api/user/list_liked_genres", 
+		base_handlers.CreateGetMethodHandler(handler.ListLikedGenres),
+	)
+
+	server.AddRoute(
+		"/api/user/get_friends_recommendations_on_genre", 
+		base_handlers.CreateGetMethodHandler(handler.GetFriendRecommendationByGenre),
 	)
 }
 
@@ -158,7 +172,7 @@ func (handler *UserHandler) CreateFriendship(request request_model.CreateFriends
 //	@Success		200		{object}	request_model.GetUserFriendsResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/user/create_friendship [get]
+//	@Router			/api/user/list_friends [get]
 func (handler *UserHandler) GetUserFriends(request request_model.GetUserFriendsRequest) (*request_model.GetUserFriendsResponse, error) {
 	friends, err := handler.repository.ListFriendshipsByUsername(request.Username)
 
@@ -169,11 +183,83 @@ func (handler *UserHandler) GetUserFriends(request request_model.GetUserFriendsR
 	friendsModel := make([]*request_model.UserResponse, 0)
 
 	for _, friend := range friends {
-		fmt.Println(friend.ToMap())
 		friendsModel = append(friendsModel, request_model.NewUserResponse(friend))
 	}
 
 	return &request_model.GetUserFriendsResponse{
+		Friends: friendsModel,
+	}, nil
+}
+
+// Marks a genre as liked by a user. Genre can be any string.
+//	@Summary		Marks a genre as liked by a user.
+//	@Description	Marks a genre as liked by a user. Genre can be any string.
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			post	body		request_model.LikeGenreRequest	true	"User data"
+//	@Success		200		{object}	request_model.SuccessCreationResponse
+//	@Failure		400		{object}	map[string]string	"Invalid Input"
+//	@Failure		500		{object}	map[string]string	"Internal Server Error"
+//	@Router			/api/user/like_genre [post]
+func (handler *UserHandler) LikeGenre(request request_model.LikeGenreRequest) (*request_model.SuccessCreationResponse, error) {
+	err := handler.repository.LikeGenre(request.Username, request.GenreName)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return request_model.NewSuccessCreationResponse("Successfully liked genre"), nil
+}
+
+// List all genres liked by a user
+//	@Summary		List all genres liked by a user
+//	@Description	List all genres liked by a user
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			post	body		request_model.GetLikedGenresRequest	true	"User data"
+//	@Success		200		{object}	request_model.GetLikedGenresResponse
+//	@Failure		400		{object}	map[string]string	"Invalid Input"
+//	@Failure		500		{object}	map[string]string	"Internal Server Error"
+//	@Router			/api/user/list_liked_genres [get]
+func (handler *UserHandler) ListLikedGenres(request request_model.GetLikedGenresRequest) (*request_model.GetLikedGenresResponse, error) {
+	genres, err := handler.repository.ListLikedGenres(request.Username)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &request_model.GetLikedGenresResponse{
+		Genres: genres,
+	}, nil
+}
+
+// This API returns user that likes the same genre of the specified user
+//	@Summary		Returns recommendations of user that likes the same genre
+//	@Description	This API returns user that likes the same genre of the specified user
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			post	body		request_model.GetFriendRecommendationByGenreRequest	true	"User data"
+//	@Success		200		{object}	request_model.GetFriendRecommendationByGenreResponse
+//	@Failure		400		{object}	map[string]string	"Invalid Input"
+//	@Failure		500		{object}	map[string]string	"Internal Server Error"
+//	@Router			/api/user/get_friends_recommendations_on_genre [get]
+func (handler *UserHandler) GetFriendRecommendationByGenre(request request_model.GetFriendRecommendationByGenreRequest) (*request_model.GetFriendRecommendationByGenreResponse, error) {
+	friends, err := handler.repository.GetRecommendationsOnGenre(request.Username)
+
+	if err != nil {
+		return nil, err
+	}
+
+	friendsModel := make([]*request_model.UserResponse, 0)
+
+	for _, friend := range friends {
+		friendsModel = append(friendsModel, request_model.NewUserResponse(friend))
+	}
+
+	return &request_model.GetFriendRecommendationByGenreResponse{
 		Friends: friendsModel,
 	}, nil
 }
