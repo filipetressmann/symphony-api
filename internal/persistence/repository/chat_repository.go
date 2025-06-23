@@ -23,7 +23,7 @@ func NewChatRepository(connection postgres.PostgreConnection) *ChatRepository {
 }
 
 func (repository *ChatRepository) Put(chat *model.Chat) error {
-    id, err := repository.connection.PutReturningId(map[string]any{}, CHAT_TABLE_NAME, "chat_id")
+    id, err := repository.connection.PutReturningId(chat.ToMap(), CHAT_TABLE_NAME, "chat_id")
     if err != nil {
         return err
     }
