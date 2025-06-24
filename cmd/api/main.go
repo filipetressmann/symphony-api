@@ -27,7 +27,7 @@ import (
 func main() {
 	postgresConnection := postgres.NewPostgreConnection()
 	mongoConnection := mongo.NewMongoConnection()
-  neo4jConnection := neo4j.NewNeo4jConnection()
+    neo4jConnection := neo4j.NewNeo4jConnection()
 
 	// Repositórios
 	songRepo := mongo_repository.NewSongRepository(mongoConnection)
@@ -38,8 +38,8 @@ func main() {
 	userCrud := user_handlers.NewUserHandler(postgresConnection, neo4jConnection)
 	postCrud := handlers.NewPostCrud(postgresConnection)
 	communityCrud := community_handlers.NewCommunityHandler(postgresConnection, neo4jConnection)
-  chatCrud := chat_handlers.NewChatHandler(postgresConnection, neo4jConnection)
-  songHandler := music_handlers.NewSongHandler(songRepo)
+    chatCrud := chat_handlers.NewChatHandler(postgresConnection, neo4jConnection)
+    songHandler := music_handlers.NewSongHandler(songRepo)
 	artistHandler := artist_handlers.NewArtistHandler(artistRepo)
 	playlistHandler := playlist_handlers.NewPlaylistHandler(playlistRepo)
 
