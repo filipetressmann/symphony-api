@@ -3,6 +3,7 @@ module symphony-api
 go 1.24
 
 require (
+	github.com/go-chi/chi/v5 v5.2.1
 	github.com/gorilla/schema v1.4.1
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/neo4j/neo4j-go-driver/v5 v5.28.1
