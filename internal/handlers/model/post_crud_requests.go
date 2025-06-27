@@ -5,17 +5,8 @@ import (
 )
 
 type CreatePostRequest struct {
-	UserId int32 `json:"user_id" binding:"required"`
+	Username string `json:"username" binding:"required"`
 	*BasePostModel
-}
-
-func (request *CreatePostRequest) ToPost() *model.Post {
-	return &model.Post{
-		UserId:    request.UserId,
-		Text:      request.Text,
-		UrlFoto:   request.UrlFoto,
-		LikeCount: request.LikeCount,
-	}
 }
 
 type BasePostModel struct {
@@ -68,30 +59,28 @@ type GetPostByIdRequest struct {
 
 type GetPostByIdResponse struct {
 	Id     int32 `json:"id" binding:"required"`
-	UserId int32 `json:"user_id" binding:"required"`
 	*BasePostModel
 }
 
 func NewGetPostByIdResponse(post *model.Post) *GetPostByIdResponse {
 	return &GetPostByIdResponse{
 		Id:            post.PostId,
-		UserId:        post.UserId,
 		BasePostModel: NewBasePostModel(post),
 	}
 }
 
-type GetPostsByUserIdRequest struct {
-	UserId int32 `schema:"user_id,required"`
+type GetPostsByUsernameRequest struct {
+	Username string `schema:"username,required"`
 }
 
-type GetPostsByUserIdResponse struct {
+type GetPostsByUsernameResponse struct {
 	Posts []*PostResponse `json:"posts" binding:"required"`
 }
 
-func NewGetPostsByUserIdResponse(posts []*model.Post) *GetPostsByUserIdResponse {
+func NewGetPostsByUsernameResponse(posts []*model.Post) *GetPostsByUsernameResponse {
 	postResponses := make([]*PostResponse, len(posts))
 	for i, post := range posts {
 		postResponses[i] = NewPostResponse(post)
 	}
-	return &GetPostsByUserIdResponse{Posts: postResponses}
+	return &GetPostsByUsernameResponse{Posts: postResponses}
 }

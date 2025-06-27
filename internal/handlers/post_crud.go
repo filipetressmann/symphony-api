@@ -8,14 +8,17 @@ import (
 	"symphony-api/internal/persistence/connectors/postgres"
 	"symphony-api/internal/persistence/repository"
 	"symphony-api/internal/server"
+	"symphony-api/internal/persistence/model"
 )
 
 type PostCrud struct {
 	repository repository.PostRepository
+	userRepository repository.UserRepository
 }
 
 func NewPostCrud(connection postgres.PostgreConnection) *PostCrud {
 	return &PostCrud{
+		userRepository: *repository.NewUserRepository(connection, nil),
 		repository: *repository.NewPostRepository(connection),
 	}
 }
@@ -30,8 +33,8 @@ func (postCrud *PostCrud) AddRoutes(server server.Server) {
 		base_handlers.CreateGetMethodHandler(postCrud.GetPostByIdHandler),
 	)
 	server.AddRoute(
-		"/api/post/get-posts-by-user-id",
-		base_handlers.CreateGetMethodHandler(postCrud.GetPostsByUserIdHandler),
+		"/api/post/get-by-username",
+		base_handlers.CreateGetMethodHandler(postCrud.GetPostsByUsernameHandler),
 	)
 }
 
@@ -48,7 +51,21 @@ func (postCrud *PostCrud) AddRoutes(server server.Server) {
 //	@Router			/api/post/create [post]
 func (postCrud *PostCrud) CreatePostHandler(request request_model.CreatePostRequest) (*request_model.CreatePostResponse, error) {
 	log.Printf("CreatePostHandler called with request: %+v", request)
-	createdPost, err := postCrud.repository.Put(request.ToPost())
+	user, err := postCrud.userRepository.GetByUsername(request.Username)
+
+	if err != nil {
+		log.Printf("Error creating post: %v", err)
+		return nil, errors.New("error creating post")
+	}
+
+	createdPost, err := postCrud.repository.Put(
+		&model.Post{
+			UserId:    user.UserId,
+			Text:      request.Text,
+			UrlFoto:   request.UrlFoto,
+			LikeCount: request.LikeCount,
+		},
+	)
 
 	if err != nil {
 		log.Printf("Error creating post: %v", err)
@@ -80,21 +97,26 @@ func (postCrud *PostCrud) GetPostByIdHandler(request request_model.GetPostByIdRe
 }
 
 // GetPostsByUserIdHandler retrieves all posts for a specific user.
-//	@Summary		Get posts by user ID
+//	@Summary		Get posts by username
 //	@Description	Retrieves all posts created by a specific user.
 //	@Tags			Post
 //	@Accept			json
 //	@Produce		json
-//	@Param			user_id	query		int	true	"User ID"
-//	@Success		200		{object}	request_model.GetPostsByUserIdResponse
+//	@Param			username	query		int	true	"Username"
+//	@Success		200		{object}	request_model.GetPostsByUsernameResponse
 //	@Failure		400		{object}	map[string]string	"Invalid Input"
 //	@Failure		500		{object}	map[string]string	"Internal Server Error"
-//	@Router			/api/post/get-posts-by-user-id [get]
-func (postCrud *PostCrud) GetPostsByUserIdHandler(request request_model.GetPostsByUserIdRequest) (*request_model.GetPostsByUserIdResponse, error) {
-	posts, err := postCrud.repository.GetByUserId(request.UserId)
+//	@Router			/api/post/get-by-username [get]
+func (postCrud *PostCrud) GetPostsByUsernameHandler(request request_model.GetPostsByUsernameRequest) (*request_model.GetPostsByUsernameResponse, error) {
+	user, err := postCrud.userRepository.GetByUsername(request.Username)
 	if err != nil {
 		log.Printf("Error getting posts: %v", err)
 		return nil, errors.New("error getting posts")
 	}
-	return request_model.NewGetPostsByUserIdResponse(posts), nil
+	posts, err := postCrud.repository.GetByUserId(user.UserId)
+	if err != nil {
+		log.Printf("Error getting posts: %v", err)
+		return nil, errors.New("error getting posts")
+	}
+	return request_model.NewGetPostsByUsernameResponse(posts), nil
 }
