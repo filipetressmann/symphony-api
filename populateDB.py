@@ -430,8 +430,6 @@ def main():
     print("   • PostgreSQL: Users, Posts, Communities, Chats")
     print("   • Neo4j: User relationships, Friendships, Genre preferences")
     print("   • MongoDB: Artists, Songs, Playlists")
-    print("\n🚀 Your Symphony API is now populated with realistic data!")
-    print("   Ready for your university presentation! 🎓")
 
 if __name__ == "__main__":
     main()

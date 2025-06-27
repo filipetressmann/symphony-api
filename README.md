@@ -30,7 +30,7 @@
    ```bash
    git clone https://github.com/felipetressmann/symphony-api.git
    cd symphony
-   docker-compose up
+   docker-compose up --build
    ```
 
 ## Autores
