@@ -33,8 +33,8 @@ func (r *PlaylistRepository) GetPlaylistByID(ctx context.Context, id primitive.O
 	return &playlist, nil
 }
 
-func (r *PlaylistRepository) GetPlaylistsByUserID(ctx context.Context, userID string) ([]model.Playlist, error) {
-	cursor, err := r.collection.Find(ctx, bson.M{"user_id": userID})
+func (r *PlaylistRepository) GetPlaylistsByUsername(ctx context.Context, username string) ([]model.Playlist, error) {
+	cursor, err := r.collection.Find(ctx, bson.M{"username": username})
 	if err != nil {
 		return nil, err
 	}

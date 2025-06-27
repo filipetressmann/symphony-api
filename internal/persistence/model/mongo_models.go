@@ -33,7 +33,7 @@ type Playlist struct {
 	ID          primitive.ObjectID 	`bson:"_id"`
 	Name        string             	`bson:"name,omitempty"`
 	Public      bool               	`bson:"public,omitempty"`
-	UserID      string             	`bson:"user_id,omitempty"`
+	Username    string             	`bson:"username,omitempty"`
 	IDSpotify   string             	`bson:"id_spotify,omitempty"`
 	Title       string             	`bson:"title,omitempty"`
 	Description string             	`bson:"description,omitempty"`

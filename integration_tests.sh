@@ -61,7 +61,7 @@ post_and_assert "http://localhost:8080/api/community/add_user" "{
 }" "Add user to community"
 
 post_and_assert "http://localhost:8080/api/community/add_user" "{
-    \"username\": \"$username\",
+    \"username\": \"$username3\",
     \"community_name\": \"$community_name\"
 }" "Add user to community"
 
@@ -69,13 +69,13 @@ post_and_assert "http://localhost:8080/api/community/list_users?community_name=$
 
 post_and_assert "http://localhost:8080/api/user/list_communities?username=$username" "{}" "List user communities"
 
-post_and_assert "http://localhost:8080/api/post/create" '{
-    "user_id": 1, "text": "Hello world", "url_foto": "image.jpg"
-}' "Create post"
+post_and_assert "http://localhost:8080/api/post/create" "{
+    \"username\": \"$username\" , \"text\": \"Hello world\", \"url_foto\": \"image.jpg\"
+}" "Create post"
 
 post_and_assert "http://localhost:8080/api/post/get-post-by-id?post_id=1" "{}" "Get post"
 
-post_and_assert "http://localhost:8080/api/post/get-posts-by-user-id?user_id=1" "{}" "List user posts"
+post_and_assert "http://localhost:8080/api/post/get-by-username?username=$username" "{}" "List user posts"
 
 post_and_assert "http://localhost:8080/api/user/create" "{
     \"username\": \"$username2\",

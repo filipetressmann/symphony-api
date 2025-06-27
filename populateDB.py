@@ -181,7 +181,7 @@ def generate_random_song(artist_id):
         "url_spotify": f"https://open.spotify.com/track/{random.randint(1000000000000000000, 9999999999999999999)}"
     }
 
-def generate_random_playlist(user_id, song_ids):
+def generate_random_playlist(username, song_ids):
     """Generate a random playlist with realistic data"""
     playlist_names = [
         "My Favorites", "Workout Mix", "Chill Vibes", "Party Time",
@@ -207,7 +207,7 @@ def generate_random_playlist(user_id, song_ids):
     return {
         "name": random.choice(playlist_names),
         "description": f"A curated collection of amazing music",
-        "user_id": user_id,
+        "username": username,
         "public": random.choice([True, False]),
         "id_spotify": f"spotify_playlist_{random.randint(1000000, 9999999)}",
         "title": random.choice(playlist_names),
@@ -215,10 +215,10 @@ def generate_random_playlist(user_id, song_ids):
         "songs": playlist_songs
     }
 
-def generate_random_post(user_id):
+def generate_random_post(username):
     """Generate a random post with realistic data"""
     return {
-        "user_id": user_id,
+        "username": username,
         "text": random.choice(POST_TEXTS),
         "url_foto": f"https://example.com/posts/post_{random.randint(1, 100)}.jpg"
     }
@@ -295,7 +295,7 @@ def populate_postgresql():
     print("\n📝 Creating posts...")
     for i in range(NUM_POSTS):
         user = random.choice(users)
-        post_data = generate_random_post(user["id"])
+        post_data = generate_random_post(user["username"])
         response = make_request("POST", f"{API_BASE_URL}/api/post/create", post_data)
         if response:
             posts.append(response)
@@ -337,7 +337,7 @@ def populate_postgresql():
     
     return users, communities, posts, chats
 
-def populate_mongodb():
+def populate_mongodb(users):
     """Populate MongoDB database with artists, songs, and playlists"""
     print("\n�� Populating MongoDB Database...")
     
@@ -368,8 +368,8 @@ def populate_mongodb():
     print("\n�� Creating playlists...")
     song_ids = [song["ID"] for song in songs]
     for i in range(NUM_PLAYLISTS):
-        user_id = f"user_{random.randint(1, NUM_USERS)}"
-        playlist_data = generate_random_playlist(user_id, song_ids)
+        username = users[random.randint(0, len(users)-1)]['username']
+        playlist_data = generate_random_playlist(username, song_ids)
         response = make_request("POST", f"{API_BASE_URL}/playlists", playlist_data)
         if response:
             playlists.append(response)
@@ -410,7 +410,7 @@ def main():
     users, communities, posts, chats = populate_postgresql()
     
     # MongoDB (artists, songs, playlists)
-    artists, songs, playlists = populate_mongodb()
+    artists, songs, playlists = populate_mongodb(users)
     
     end_time = time.time()
     

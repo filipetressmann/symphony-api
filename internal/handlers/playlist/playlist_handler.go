@@ -78,7 +78,7 @@ func (h *PlaylistHandler) GetPlaylistsByUsername(w http.ResponseWriter, r *http.
 	ctx := context.Background()
 	username := chi.URLParam(r, "username")
 
-	playlist, err := h.repo.GetPlaylistsByUserID(ctx, username)
+	playlist, err := h.repo.GetPlaylistsByUsername(ctx, username)
 	if err != nil {
 		http.Error(w, "Playlists not found", http.StatusNotFound)
 		return
@@ -94,7 +94,7 @@ func (h *PlaylistHandler) GetPlaylistsByUsername(w http.ResponseWriter, r *http.
 type CreatePlaylistRequest struct {
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
-	UserID      string `json:"user_id,omitempty"`
+	Username    string `json:"username,omitempty"`
 	Public      bool   `json:"public,omitempty"`
 	IDSpotify   string `json:"id_spotify,omitempty"`
 	Title       string `json:"title,omitempty"`
@@ -151,7 +151,7 @@ func (h *PlaylistHandler) CreatePlaylist(w http.ResponseWriter, r *http.Request)
 		ID:          primitive.NewObjectID(),
 		Name:        req.Name,
 		Description: req.Description,
-		UserID:      req.UserID,
+		Username:    req.Username,
 		Public:      req.Public,
 		IDSpotify:   req.IDSpotify,
 		Title:       req.Title,
