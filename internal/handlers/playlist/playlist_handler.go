@@ -27,7 +27,7 @@ func (h *PlaylistHandler) AddRoutes(server interface {
 	server.AddGroup("/playlists", func(r chi.Router) {
 		r.Get("/{id}", h.GetPlaylistByID)
 		r.Get("/user/{username}", h.GetPlaylistsByUsername)
-		r.Post("/", h.CreatePlaylist)
+		r.Post("/create", h.CreatePlaylist)
 		r.Post("/{id}/songs", h.AddSongToPlaylist)
 	})
 }
@@ -115,7 +115,7 @@ type CreatePlaylistRequest struct {
 // @Success 201 {object} model.Playlist
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /playlists [post]
+// @Router /playlists/create [post]
 func (h *PlaylistHandler) CreatePlaylist(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	var req CreatePlaylistRequest

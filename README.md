@@ -11,7 +11,6 @@
 ## Funcionalidades
 
 - **Perfis de Usuário**: Criação e personalização de perfis, onde usuários podem adicionar suas músicas favoritas e acompanhar suas playlists.
-- **Descoberta de Música**: Sistema de recomendação baseado nos gostos e nas interações dos usuários.
 - **Relacionamentos Sociais**: Usuários podem seguir outros usuários, compartilhar músicas e playlists.
 - **Listas de Reproduções**: Criação de playlists personalizadas e compartilháveis.
 - **Interações**: Curtir, comentar e compartilhar músicas e playlists.
@@ -37,12 +36,18 @@
    docker-compose up --build
    ```
 
-### Como popular a aplicação com dados aleatórios
+### Como popular a aplicação com dados aleatórios?
 
 Para popular a aplicação com dados aleatórios você pode executar o script `populateDB.py` presente na raiz do projeto:
    ```bash
    python3 populateDB.py
    ```
+
+Além disso, existem os scripts `integration_tests.sh` e `mongo_integration_test.sh`. Esses scripts também podem ser usados para popular o banco mas servem mais como um sanity check ao desenvolver.
+
+### Como executar requests?
+
+Para interagir com a API, suba a aplicação com `docker-compose` e vá até `http://localhost:8080/swagger/index.html` no seu navegador para abrir a UI do swagger.
 
 ## Autores
 - Thiago Duvanel Ferreira

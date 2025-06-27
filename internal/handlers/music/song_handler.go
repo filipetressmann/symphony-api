@@ -24,9 +24,9 @@ func (h *SongHandler) AddRoutes(server interface {
 	AddGroup(pattern string, fn func(r chi.Router))
 }) {
 	server.AddGroup("/songs", func(r chi.Router) {
-		r.Get("/", h.GetAllSongs)
+		r.Get("/list", h.GetAllSongs)
 		r.Get("/{id}", h.GetSongByID)
-		r.Post("/", h.CreateSong)
+		r.Post("/create", h.CreateSong)
 	})
 }
 
@@ -38,7 +38,7 @@ func (h *SongHandler) AddRoutes(server interface {
 // @Produce json
 // @Success 200 {array} model.Song
 // @Failure 500 {object} map[string]string
-// @Router /songs [get]
+// @Router /songs/list [get]
 func (h *SongHandler) GetAllSongs(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	songs, err := h.repo.GetAllSongs(ctx)
@@ -105,7 +105,7 @@ type CreateSongRequest struct {
 // @Success 201 {object} model.Song
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /songs [post]
+// @Router /songs/create [post]
 func (h *SongHandler) CreateSong(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	var req CreateSongRequest

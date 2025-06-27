@@ -26,7 +26,7 @@ func (h *ArtistHandler) AddRoutes(server interface {
 	server.AddGroup("/artists", func(r chi.Router) {
 		r.Get("/{id}", h.GetArtistByID)
 		r.Get("/spotify/{spotify_id}", h.GetArtistBySpotifyID)
-		r.Post("/", h.CreateArtist)
+		r.Post("/create", h.CreateArtist)
 	})
 }
 
@@ -107,7 +107,7 @@ type CreateArtistRequest struct {
 // @Success 201 {object} model.Artist
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /artists [post]
+// @Router /artists/create [post]
 func (h *ArtistHandler) CreateArtist(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	var req CreateArtistRequest
