@@ -267,17 +267,17 @@ def populate_postgresql():
             user_data["id"] = i + 1  # We'll use the index as ID for now
             users.append(user_data)
             print(f"✅ Created user: {user_data['username']}")
-        time.sleep(0.1)  # Rate limiting
     
     # Create communities
     print("\n🏘️  Creating communities...")
+    community_names = []
     for i in range(NUM_COMMUNITIES):
         community_data = generate_random_community()
         response = make_request("POST", f"{API_BASE_URL}/api/community/create", community_data)
-        if response:
+        if response and community_names.count(community_data['community_name']) == 0:
+            community_names.append(community_data['community_name'])
             communities.append(community_data)
             print(f"✅ Created community: {community_data['community_name']}")
-        time.sleep(0.1)
     
     # Add users to communities
     print("\n👥 Adding users to communities...")
@@ -290,18 +290,16 @@ def populate_postgresql():
                 "community_name": community["community_name"]
             }
             make_request("POST", f"{API_BASE_URL}/api/community/add_user", data)
-        time.sleep(0.1)
     
     # Create posts
     print("\n📝 Creating posts...")
     for i in range(NUM_POSTS):
         user = random.choice(users)
         post_data = generate_random_post(user["id"])
-        response = make_request("POST", f"{API_BASE_URL}/api/create-post", post_data)
+        response = make_request("POST", f"{API_BASE_URL}/api/post/create", post_data)
         if response:
             posts.append(response)
             print(f"✅ Created post {i+1}/{NUM_POSTS}")
-        time.sleep(0.1)
     
     # Create chats and friendships
     print("\n�� Creating chats and friendships...")
@@ -324,7 +322,6 @@ def populate_postgresql():
         if response:
             chats.append(response)
             print(f"✅ Created chat {i+1}/{NUM_CHATS}")
-        time.sleep(0.1)
     
     # Add genre preferences to users
     print("\n🎵 Adding genre preferences...")
@@ -337,7 +334,6 @@ def populate_postgresql():
                 "genre_name": genre
             }
             make_request("POST", f"{API_BASE_URL}/api/user/like_genre", data)
-        time.sleep(0.1)
     
     return users, communities, posts, chats
 
@@ -357,22 +353,20 @@ def populate_mongodb():
         if response:
             artists.append(response)
             print(f"✅ Created artist: {artist_data['name']}")
-        time.sleep(0.1)
     
     # Create songs
     print("\n🎵 Creating songs...")
     for i in range(NUM_SONGS):
         artist = random.choice(artists)
-        song_data = generate_random_song(artist["_id"])
+        song_data = generate_random_song(artist["ID"])
         response = make_request("POST", f"{API_BASE_URL}/songs", song_data)
         if response:
             songs.append(response)
             print(f"✅ Created song {i+1}/{NUM_SONGS}: {song_data['title']}")
-        time.sleep(0.1)
     
     # Create playlists
     print("\n�� Creating playlists...")
-    song_ids = [song["_id"] for song in songs]
+    song_ids = [song["ID"] for song in songs]
     for i in range(NUM_PLAYLISTS):
         user_id = f"user_{random.randint(1, NUM_USERS)}"
         playlist_data = generate_random_playlist(user_id, song_ids)
@@ -380,7 +374,6 @@ def populate_mongodb():
         if response:
             playlists.append(response)
             print(f"✅ Created playlist {i+1}/{NUM_PLAYLISTS}: {playlist_data['name']}")
-        time.sleep(0.1)
     
     return artists, songs, playlists
 
