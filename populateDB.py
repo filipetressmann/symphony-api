@@ -349,7 +349,7 @@ def populate_mongodb(users):
     print("🎤 Creating artists...")
     for i in range(NUM_ARTISTS):
         artist_data = generate_random_artist()
-        response = make_request("POST", f"{API_BASE_URL}/artists", artist_data)
+        response = make_request("POST", f"{API_BASE_URL}/artists/create", artist_data)
         if response:
             artists.append(response)
             print(f"✅ Created artist: {artist_data['name']}")
@@ -359,7 +359,7 @@ def populate_mongodb(users):
     for i in range(NUM_SONGS):
         artist = random.choice(artists)
         song_data = generate_random_song(artist["ID"])
-        response = make_request("POST", f"{API_BASE_URL}/songs", song_data)
+        response = make_request("POST", f"{API_BASE_URL}/songs/create", song_data)
         if response:
             songs.append(response)
             print(f"✅ Created song {i+1}/{NUM_SONGS}: {song_data['title']}")
@@ -370,7 +370,7 @@ def populate_mongodb(users):
     for i in range(NUM_PLAYLISTS):
         username = users[random.randint(0, len(users)-1)]['username']
         playlist_data = generate_random_playlist(username, song_ids)
-        response = make_request("POST", f"{API_BASE_URL}/playlists", playlist_data)
+        response = make_request("POST", f"{API_BASE_URL}/playlists/create", playlist_data)
         if response:
             playlists.append(response)
             print(f"✅ Created playlist {i+1}/{NUM_PLAYLISTS}: {playlist_data['name']}")
