@@ -28,9 +28,20 @@
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/felipetressmann/symphony-api.git
+   git clone git@github.com:filipetressmann/symphony-api.git
    cd symphony
+   ```
+2. Crie um arquivo `.env` com os conteúdos presentes no arquivo `.env.example`
+3. Execute o comando abaixo para subir a aplicação:
+   ```bash
    docker-compose up --build
+   ```
+
+### Como popular a aplicação com dados aleatórios
+
+Para popular a aplicação com dados aleatórios você pode executar o script `populateDB.py` presente na raiz do projeto:
+   ```bash
+   python3 populateDB.py
    ```
 
 ## Autores
